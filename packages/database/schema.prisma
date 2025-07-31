@@ -99,7 +99,7 @@ model User {
   /// @prismabox.hide.input
   name      String @map("full_name") @db.VarChar(101)
 
-  tcNo String @unique @map("tc_no") @db.VarChar(11)
+  tcNo String? @unique @map("tc_no") @db.VarChar(11)
 
   gender Gender
 

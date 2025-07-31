@@ -1,10 +1,10 @@
+import { auth, authSwagger } from '#modules/auth/authentication/plugin';
 import cors from '@elysiajs/cors';
 import staticPlugin from '@elysiajs/static';
 import swagger from '@elysiajs/swagger';
 import { createSeederServer } from '@onlyjs/db/seeder/server';
 import { Elysia } from 'elysia';
 import path from 'path';
-import { auth, authSwagger } from '#modules/auth/authentication/plugin';
 import { loadEnv } from './config/env';
 import { handleElysiaError } from './config/error-handler';
 import { prepareSwaggerConfig } from './config/swagger.config';

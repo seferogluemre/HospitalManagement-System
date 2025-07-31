@@ -9,7 +9,6 @@ export class SystemAdministrationService {
         "Bu işlem sadece development environment'ında kullanılabilir.",
       );
     }
-
     try {
       const { exec } = await import('child_process');
       const { promisify } = await import('util');
