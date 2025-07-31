@@ -58,6 +58,16 @@ enum FileLibraryAssetFileType {
   @@map("file_library_asset_file_type")
 }
 
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  COMPLETED
+  NO_SHOW
+  CANCELLED
+
+  @@map("appointment_status")
+}
+
 enum FileLibraryAssetMimeType {
   IMAGE_JPEG // image/jpeg
   IMAGE_PNG // image/png
@@ -89,6 +99,8 @@ model User {
   /// @prismabox.hide.input
   name      String @map("full_name") @db.VarChar(101)
 
+  tcNo String @unique @map("tc_no") @db.VarChar(11)
+
   gender Gender
 
   createdBy   User?   @relation("UserToCreator", fields: [createdById], references: [id], onDelete: SetNull)
@@ -114,13 +126,17 @@ model User {
   banReason    String?
   banExpiresAt DateTime?
 
-  createdUsers   User[]     @relation("UserToCreator")
-  auditLogs      AuditLog[] @relation("AuditLogsToUser")
-  posts          Post[]     @relation("PostToUser")
-  userRoles      UserRole[] @relation("UserRoleToUser")
+  createdUsers   User[]         @relation("UserToCreator")
+  auditLogs      AuditLog[]     @relation("AuditLogsToUser")
+  posts          Post[]         @relation("PostToUser")
+  userRoles      UserRole[]     @relation("UserRoleToUser")
   sessions       Session[]
   accounts       Account[]
-  impersonations Session[]  @relation("SessionToImpersonatedBy")
+  impersonations Session[]      @relation("SessionToImpersonatedBy")
+  doctors        Doctor[]
+  patients       Patient[]
+  secretaries    Secretary[]
+  announcements   Announcement[] @relation("AnnouncementAuthor")
 
   @@index([deletedAt])
   @@map("users")
@@ -447,3 +463,210 @@ model FileLibraryAsset {
 
   @@map("file_library_assets")
 }
+
+model Clinic {
+  /// @prismabox.hide
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
+
+  /// @prismabox.options{minLength:2,maxlength:100}
+  name String @db.VarChar(100)
+
+  /// @prismabox.options{minLength:2,maxLength:100}
+  description String? @db.VarChar(100)
+
+  /// @prismabox.options{minLength:0,maxLength:255}
+  address String? @db.VarChar(255)
+
+  /// @prismabox.options{minLength:0,maxLength:20}
+  phone String? @db.VarChar(20)
+
+  /// @prismabox.options{minLength:0,maxLength:100}
+  email String? @db.VarChar(100)
+
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  /// @prismabox.input.hide
+  deletedAt   DateTime?         @map("deleted_at")
+  doctors     Doctor[]
+  secretaries SecretaryClinic[]
+
+  @@index([deletedAt])
+  @@map("clinics")
+}
+
+model Doctor {
+  /// @prismabox.hide
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// @prismabox.hide
+  userId String @map("user_id")
+
+  /// @prismabox.options{minLength:2,maxLength:100}
+  specialty String @db.VarChar(100)
+
+  clinic   Clinic @relation(fields: [clinicId], references: [id])
+  /// @prismabox.hide
+  clinicId Int    @map("clinic_id")
+
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  /// @prismabox.input.hide
+  deletedAt      DateTime?     @map("deleted_at")
+  familyPatients Patient[]     @relation("FamilyDoctorPatients")
+  appointments    Appointment[]
+
+  @@index([userId])
+  @@index([clinicId])
+  @@index([deletedAt])
+  @@map("doctors")
+}
+
+model Patient {
+  /// @prismabox.hide
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// @prismabox.hide
+  userId String @map("user_id")
+
+  /// @prismabox.options{minLength:0,maxLength:20}
+  phoneNumber String? @map("phone_number") @db.VarChar(20)
+
+  /// @prismabox.options{minLength:0,maxLength:255}
+  address String? @db.VarChar(255)
+
+  dateOfBirth DateTime? @map("date_of_birth")
+
+  // Aile hekimi (opsiyonel)
+  familyDoctor   Doctor? @relation("FamilyDoctorPatients", fields: [familyDoctorId], references: [id])
+  /// @prismabox.hide
+  familyDoctorId Int?    @map("family_doctor_id")
+
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  /// @prismabox.input.hide
+  deletedAt    DateTime?     @map("deleted_at")
+  appointments Appointment[]
+
+  @@index([userId])
+  @@index([familyDoctorId])
+  @@index([deletedAt])
+  @@map("patients")
+}
+
+model Secretary {
+  /// @prismabox.hide
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  clinics SecretaryClinic[]
+
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  /// @prismabox.input.hide
+  deletedAt   DateTime?     @map("deleted_at")
+  createdAppointments Appointment[]
+
+  @@index([userId])
+  @@index([deletedAt])
+  @@map("secretaries")
+}
+
+model SecretaryClinic {
+  /// @prismabox.hide
+  id Int @id @default(autoincrement())
+
+  secretary   Secretary @relation(fields: [secretaryId], references: [id], onDelete: Cascade)
+  /// @prismabox.hide
+  secretaryId Int       @map("secretary_id")
+
+  clinic   Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  /// @prismabox.hide
+  clinicId Int    @map("clinic_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([secretaryId, clinicId])
+  @@index([secretaryId])
+  @@index([clinicId])
+  @@map("secretary_clinics")
+}
+
+model Appointment {
+  /// @prismabox.hide
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
+
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  /// @prismabox.hide
+  patientId Int     @map("patient_id")
+
+  doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  /// @prismabox.hide
+  doctorId Int    @map("doctor_id")
+
+  appointmentDate DateTime          @map("appointment_date")
+  status          AppointmentStatus
+
+  /// @prismabox.options{minLength:0,maxLength:1000}
+  description String? @db.Text
+
+  /// @prismabox.options{minLength:0,maxLength:1000}
+  notes String? @db.Text
+
+  completedAt DateTime? @map("completed_at")
+
+  // Randevuyu oluşturan sekreter (opsiyonel)
+  createdBySecretary   Secretary? @relation(fields: [createdBySecretaryId], references: [id])
+  /// @prismabox.hide
+  createdBySecretaryId Int?       @map("created_by_secretary_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  /// @prismabox.input.hide
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([appointmentDate])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model Announcement {
+  /// @prismabox.hide
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
+
+  /// @prismabox.options{minLength:2,maxLength:255}
+  title String @db.VarChar(255)
+
+  /// @prismabox.options{minLength:2}
+  content String @db.Text
+
+  isActive Boolean @default(true) @map("is_active")
+
+  // Hangi rollere gösterilecek
+  targetRoles String[] @default([]) @map("target_roles")
+
+  author   User   @relation("AnnouncementAuthor", fields: [authorId], references: [id])
+  /// @prismabox.hide
+  authorId String @map("author_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  /// @prismabox.input.hide
+  deletedAt DateTime? @map("deleted_at")
+ 
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("announcements")
+}
+
