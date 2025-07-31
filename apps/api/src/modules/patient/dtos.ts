@@ -1,21 +1,20 @@
-import { t } from "elysia";
-import { PatientPlain } from "../../../../../packages/database/prismabox/Patient"
-import { UserPlain } from "@onlyjs/db/prismabox/User";
-import { DoctorPlain } from "@onlyjs/db/prismabox/Doctor";
-import type { ControllerHook } from "#utils/elysia-types.ts";
 import { errorResponseDto } from "#utils/common-dtos.ts";
+import type { ControllerHook } from "#utils/elysia-types.ts";
+import { DoctorPlain } from "@onlyjs/db/prismabox/Doctor";
+import { UserPlain } from "@onlyjs/db/prismabox/User";
+import { t } from "elysia";
+import { PatientPlain } from "../../../../../packages/database/prismabox/Patient";
 
 export const patientResponseSchema = t.Composite([
-    t.Omit(PatientPlain, ["userId", "familyDoctorId"]),
+    t.Omit(PatientPlain, ["userId", "familyDoctorId","deletedAt"]),
     t.Object({
         user: t.Pick(UserPlain, ["id", "firstName", "lastName", "email", "tcNo", "gender"]),
-        familyDoctor: t.Optional(
+        familyDoctor: t.Nullable(
             t.Pick(DoctorPlain, ['id', 'specialty'])
         ),
     })
 
 ])
-
 export const patientsIndexDto = {
     query: t.Object({
         page: t.Optional(t.String()),
@@ -44,6 +43,29 @@ export const patientShowDto = {
         summary: 'Show Patient',
     },
 } satisfies ControllerHook;
+
+export const patientUpdateDto = {
+    params: t.Object({
+        id: t.String(),
+    }),
+    body: t.Partial(
+        t.Pick(PatientPlain, [
+            'phoneNumber',
+            'address',
+            'dateOfBirth',
+            'familyDoctorId',
+        ])
+    ),
+    response: {
+        200: patientResponseSchema,
+        404: errorResponseDto[404],
+        422: errorResponseDto[422],
+    },
+    detail: {
+        summary: 'Update Patient',
+    },
+} satisfies ControllerHook;
+
 
 export const patientCreateDto = {
     body: t.Object({

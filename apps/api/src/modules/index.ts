@@ -5,6 +5,7 @@ import { locationsController } from './locations';
 import { postsController } from './posts';
 import { systemAdministrationController } from './system-administration';
 import { usersController } from './users';
+import { patientController } from './patient';
 
 const app = new Elysia()
   .use(systemAdministrationController)
@@ -14,6 +15,7 @@ const app = new Elysia()
   .use(postsController)
   .use(locationsController)
   .use(fileLibraryAssetsController)
+  .use(patientController)
   .get(
     '/',
     () => ({
@@ -42,6 +44,7 @@ export const swaggerTags: { name: string; description: string }[] = [
   { name: 'Region', description: 'Region endpoints' },
   { name: 'Subregion', description: 'Subregion endpoints' },
   { name: 'File Library Assets', description: 'File Library Assets endpoints' },
+  { name: 'Patient', description: 'Patient endpoints' },
 ];
 
 export default app;

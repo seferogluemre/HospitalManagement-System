@@ -9,7 +9,7 @@ export abstract class PatientService {
         try {
             const filterQuery = query ? { ...query, familyDoctorId: query.familyDoctorId === null ? undefined : query.familyDoctorId } : undefined
 
-            const where = Prisma.PatientWhereInput = {
+            const where: Prisma.PatientWhereInput = {
                 deletedAt: null
             }
 
@@ -53,7 +53,8 @@ export abstract class PatientService {
             });
 
         } catch (error) {
-            throw HandleError.handlePrismaError(error, "patient", "find")
+            await HandleError.handlePrismaError(error, "patient", "find")
+            throw error
         }
     }
 
@@ -91,7 +92,8 @@ export abstract class PatientService {
             return patient;
 
         } catch (error) {
-            throw HandleError.handlePrismaError(error, "patient", "find")
+            await HandleError.handlePrismaError(error, "patient", "find")
+            throw error
         }
     }
 
@@ -101,8 +103,16 @@ export abstract class PatientService {
             const existingUser = await prisma.patient.findFirst({
                 where: {
                     OR: [
-                        { email: payload.email },
-                        { tcNo: payload.tcNo }
+                        {
+                            user: {
+                                email: payload.email
+                            }
+                        },
+                        {
+                            user: {
+                                tcNo: payload.tcNo
+                            }
+                        }
                     ],
                     deletedAt: null,
 
@@ -164,7 +174,8 @@ export abstract class PatientService {
 
             return result
         } catch (error) {
-            throw HandleError.handlePrismaError(error, "patient", "create")
+                await HandleError.handlePrismaError(error, "patient", "create")
+            throw error
         }
     }
 
