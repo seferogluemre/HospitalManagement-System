@@ -1,0 +1,11 @@
+{
+  "name": "tsconfig-custom",
+  "version": "0.0.0",
+  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@tsconfig/bun": "^1.0.8"
+  }
+}

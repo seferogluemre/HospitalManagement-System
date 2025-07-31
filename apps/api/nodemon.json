@@ -1,0 +1,8 @@
+{
+  "watch": ["src", "../../packages/database", ".env", "../../config/apps/api/.env"],
+  "ext": "ts,js,json",
+  "ignore": ["node_modules", "dist", "*.test.ts", "*.spec.ts"],
+  "exec": "bun run src/index.ts",
+  "delay": 150,
+  "quiet": true
+}

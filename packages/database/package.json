@@ -1,0 +1,43 @@
+{
+  "name": "@onlyjs/db",
+  "version": "0.0.0",
+  "type": "module",
+  "config": {
+    "envFile": "../../config/apps/api/.env"
+  },
+  "scripts": {
+    "prisma": "prisma --",
+    "format": "prisma-case-format --file ./prisma/schema.prisma --table-case pascal --field-case camel --enum-case pascal --map-table-case snake,plural --map-field-case snake --map-enum-case snake --pluralize",
+    "generate": "dotenvx run --quiet -f ../../config/apps/api/.env -- prisma generate",
+    "migrate": "dotenvx run --quiet -f ../../config/apps/api/.env -- prisma migrate dev",
+    "studio": "dotenvx run --quiet -f ../../config/apps/api/.env -- prisma studio",
+    "seed": "dotenvx run --quiet -f ../../config/apps/api/.env -- bun run generate && dotenvx run --quiet -f ../../config/apps/api/.env -- bun run seeder:run",
+    "seeder": "dotenvx run --quiet -f ../../config/apps/api/.env -- bun ./src/seeder/cli.ts",
+    "seeder:list": "dotenvx run --quiet -f ../../config/apps/api/.env -- bun ./src/seeder/cli.ts list",
+    "seeder:run": "dotenvx run --quiet -f ../../config/apps/api/.env -- bun ./src/seeder/cli.ts run",
+    "seeder:test": "bun ./src/seeder/cli.ts",
+    "db:start": "docker-compose up -d",
+    "db:stop": "docker-compose down",
+    "db:logs": "docker-compose logs -f",
+    "db:init": "bun run db:start && bun run prisma:generate && bun run prisma:migrate"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.6.0",
+    "elysia": "1.2.25",
+    "prisma": "^6.6.0"
+  },
+  "prisma": {
+    "seed": "bun ./src/seeder/cli.ts run"
+  },
+  "exports": {
+    "./enums": "./client/enums.ts",
+    "./client/runtime/library": "./proxies/runtime/library.ts",
+    "./client": "./client/client.ts",
+    "./client/*": "./client/*.ts",
+    "./prismabox/*": "./prismabox/*.ts",
+    "./seeder": "./src/seeder/index.ts",
+    "./seeder/*": "./src/seeder/*.ts",
+    "./types": "./types.ts",
+    ".": "./index.ts"
+  }
+}

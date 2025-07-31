@@ -1,0 +1,38 @@
+{
+  "extends": "tsconfig-custom/react-app.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "tsBuildInfoFile": "../../dist/apps/web/.app.tsbuildinfo",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Alias */
+    "baseUrl": ".",
+    "paths": {
+      "#*": ["./src/*"],
+      "@onlyjs/api": ["../api/src/index.ts"]
+    },
+    "outDir": "../../dist/apps/web",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "types": ["@onlyjs/eden/types"]
+  },
+
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.json", "../../packages/eden/types.d.ts"]
+}

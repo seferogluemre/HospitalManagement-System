@@ -1,0 +1,14 @@
+diff --git a/dist/helpers/typescript.js b/dist/helpers/typescript.js
+index b61f02fb2545238718631ce4791ac71910f4d0eb..27313dc63731858f3d0217c8fe5b6ea7998169ac 100644
+--- a/dist/helpers/typescript.js
++++ b/dist/helpers/typescript.js
+@@ -356,7 +356,8 @@ exports.getRootSourceFile = getRootSourceFile;
+ function getNodeOwnSymbol(node, typeChecker) {
+     const nodeSymbol = typeChecker.getSymbolAtLocation(node);
+     if (nodeSymbol === undefined) {
+-        throw new Error(`Cannot find symbol for node "${node.getText()}" in "${node.parent.getText()}" from "${node.getSourceFile().fileName}"`);
++        //throw new Error(`Cannot find symbol for node "${node.getText()}" in "${node.parent.getText()}" from "${node.getSourceFile().fileName}"`);
++        return {}
+     }
+     return nodeSymbol;
+ }

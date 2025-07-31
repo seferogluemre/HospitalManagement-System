@@ -1,0 +1,35 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+      
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  install-lint-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install bun
+        run: npm install -g bun  
+
+      - name: Install dependencies
+        run: bun install
+
+      # - name: Analyze unused files and dependencies
+      #   run: bun knip
+
+      - name: Build the project
+        run: bun build

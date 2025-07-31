@@ -1,0 +1,13 @@
+{
+  "extends": "tsconfig-custom/base.json",
+  "compilerOptions": {
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowImportingTsExtensions": true,
+    "outDir": "../../dist/packages/database",
+    "tsBuildInfoFile": "../../dist/packages/database/.tsbuildinfo"
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["dist", "node_modules"]
+}

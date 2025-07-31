@@ -1,0 +1,14 @@
+{
+  "extends": "tsconfig-custom/elysia.json",
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "tsBuildInfoFile": "../../dist/apps/api/.tsbuildinfo",
+    "paths": {
+      "#*": ["./src/*"]
+    },
+    "outDir": "../../dist/apps/api"
+  },
+  "include": ["src/**/*.ts", "package.json"],
+  "references": [{ "path": "../../packages/database" }]
+}

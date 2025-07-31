@@ -1,0 +1,49 @@
+{
+  "name": "@onlyjs/api",
+  "version": "0.0.1",
+  "config": {
+    "envFile": "../../config/apps/api/.env"
+  },
+  "scripts": {
+    "build": "dotenvx run --quiet -f ../../config/apps/api/.env -- bun ./src/core/build.ts",
+    "emails:preview": "email dev --dir src/emails --port 3333",
+    "knip": "knip --workspace apps/api",
+    "dev": "dotenvx run --quiet -f ../../config/apps/api/.env -- nodemon",
+    "serve": "dotenvx run --quiet -f ../../config/apps/api/.env -- bun run dev",
+    "start": "dotenvx run --quiet -f ../../config/apps/api/.env -- bun ../../dist/apps/api/index.js",
+    "prisma": "cd ../../packages/database && bun run prisma"
+  },
+  "type": "module",
+  "dependencies": {
+    "@elysiajs/bearer": "1.2.0",
+    "@elysiajs/cors": "1.2.0",
+    "@elysiajs/cron": "1.2.0",
+    "@elysiajs/static": "1.2.0",
+    "@elysiajs/swagger": "1.2.2",
+    "@onlyjs/db": "workspace:*",
+    "@react-email/components": "^0.0.33",
+    "better-auth": "^1.2.7",
+    "elysia": "1.2.25",
+    "http-errors": "^2.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "redis": "^4.7.0",
+    "slugify": "^1.6.6"
+  },
+  "devDependencies": {
+    "@types/http-errors": "^2.0.4",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "bun-plugin-dts": "0.3.0",
+    "nodemon": "^3.0.2",
+    "prisma-case-format": "^2.2.1",
+    "prismabox": "^1.1.24",
+    "react-email": "^3.0.7"
+  },
+  "main": "./src/index.ts",
+  "private": true,
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": "./src/index.ts"
+}
