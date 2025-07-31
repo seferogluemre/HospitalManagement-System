@@ -84,7 +84,7 @@ export abstract class PatientService {
                     },
                 },
             })
-
+            
             if (!patient) {
                 throw new NotFoundException('Hasta bulunamadı');
             }

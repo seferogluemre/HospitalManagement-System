@@ -33,7 +33,7 @@ export const patientsIndexDto = {
 
 export const patientShowDto = {
     params: t.Object({
-        id: t.String(),
+        uuid: t.String(),
     }),
     response: {
         200: patientResponseSchema,
