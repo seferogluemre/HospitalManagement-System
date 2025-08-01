@@ -1,13 +1,14 @@
 import Elysia from 'elysia';
 import { authenticationController, rolesController } from './auth';
+import { clinicController } from './clinics';
+import { doctorController } from './doctors';
 import { fileLibraryAssetsController } from './file-library-assets';
 import { locationsController } from './locations';
+import { patientController } from './patients';
 import { postsController } from './posts';
+import { secretaryController } from './secretaries';
 import { systemAdministrationController } from './system-administration';
 import { usersController } from './users';
-import { patientController } from './patients';
-import { doctorController } from './doctors';
-import { secretaryController } from './secretaries';
 
 const app = new Elysia()
   .use(systemAdministrationController)
@@ -20,6 +21,7 @@ const app = new Elysia()
   .use(patientController)
   .use(doctorController)
   .use(secretaryController)
+  .use(clinicController)
   .get(
     '/',
     () => ({
@@ -51,6 +53,7 @@ export const swaggerTags: { name: string; description: string }[] = [
   { name: 'Patient', description: 'Patient endpoints' },
   { name: 'Doctor', description: 'Doctor endpoints' },
   { name: 'Secretary', description: 'Secretary endpoints' },
+  { name: 'Clinic', description: 'Clinic endpoints' },
 ];
 
 export default app;

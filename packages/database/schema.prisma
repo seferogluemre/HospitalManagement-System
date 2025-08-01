@@ -481,9 +481,6 @@ model Clinic {
   /// @prismabox.options{minLength:0,maxLength:20}
   phone String? @db.VarChar(20)
 
-  /// @prismabox.options{minLength:0,maxLength:100}
-  email String? @db.VarChar(100)
-
   createdAt   DateTime          @default(now()) @map("created_at")
   updatedAt   DateTime          @updatedAt @map("updated_at")
   /// @prismabox.input.hide
