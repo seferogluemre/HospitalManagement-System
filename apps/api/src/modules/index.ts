@@ -1,4 +1,5 @@
 import Elysia from 'elysia';
+import { appointmentController } from './appointments';
 import { authenticationController, rolesController } from './auth';
 import { clinicController } from './clinics';
 import { doctorController } from './doctors';
@@ -22,6 +23,7 @@ const app = new Elysia()
   .use(doctorController)
   .use(secretaryController)
   .use(clinicController)
+  .use(appointmentController)
   .get(
     '/',
     () => ({
