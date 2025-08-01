@@ -5,7 +5,7 @@ import { locationsController } from './locations';
 import { postsController } from './posts';
 import { systemAdministrationController } from './system-administration';
 import { usersController } from './users';
-import { patientController } from './patient';
+import { patientController } from './doctors';
 
 const app = new Elysia()
   .use(systemAdministrationController)
