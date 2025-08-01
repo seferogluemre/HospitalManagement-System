@@ -3,6 +3,7 @@ import { ConflictException, InternalServerErrorException, NotFoundException } fr
 import prisma from "@onlyjs/db";
 import { Prisma, type Patient } from "@onlyjs/db/client";
 import type { PatientCreatePayload, PatientIndexQuery, PatientUpdatePayload } from "./types";
+import { tr } from "@faker-js/faker";
 
 export abstract class PatientService {
     static async index(query?: PatientIndexQuery): Promise<Patient[]> {
@@ -84,7 +85,7 @@ export abstract class PatientService {
                     },
                 },
             })
-            
+
             if (!patient) {
                 throw new NotFoundException('Hasta bulunamadı');
             }
@@ -174,7 +175,7 @@ export abstract class PatientService {
 
             return result
         } catch (error) {
-                await HandleError.handlePrismaError(error, "patient", "create")
+            await HandleError.handlePrismaError(error, "patient", "create")
             throw error
         }
     }
@@ -226,11 +227,11 @@ export abstract class PatientService {
         }
     }
 
-    static async destroy(id: string): Promise<void> {
+    static async destroy(uuid: string): Promise<void> {
         try {
             const patient = await prisma.patient.findFirst({
                 where: {
-                    uuid: id,
+                    uuid: uuid,
                     deletedAt: null,
                 },
             });
@@ -242,7 +243,7 @@ export abstract class PatientService {
             // Soft delete both patient and user
             await prisma.$transaction(async (tx) => {
                 await tx.patient.update({
-                    where: { uuid: id },
+                    where: { uuid: uuid },
                     data: { deletedAt: new Date() },
                 });
 
@@ -257,10 +258,10 @@ export abstract class PatientService {
         }
     }
 
-    static async restore(id: string) {
+    static async restore(uuid: string) {
         try {
             const patient = await prisma.patient.findFirst({
-                where: { uuid: id, deletedAt: { not: null } },
+                where: { uuid: uuid, deletedAt: { not: null } },
                 include: { user: true },
             });
 
@@ -276,7 +277,7 @@ export abstract class PatientService {
                 });
 
                 return await tx.patient.update({
-                    where: { uuid: id },
+                    where: { uuid: uuid },
                     data: { deletedAt: null },
                     include: {
                         user: {

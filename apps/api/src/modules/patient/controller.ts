@@ -4,11 +4,11 @@ import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
 import { AuditLogAction, AuditLogEntity, withAuditLog } from "../audit-logs";
 import {
-    patientCreateDto,
-    patientDestroyDto,
-    patientShowDto,
-    patientsIndexDto,
-    patientUpdateDto,
+  patientCreateDto,
+  patientDestroyDto,
+  patientShowDto,
+  patientsIndexDto,
+  patientUpdateDto,
 } from "./dtos";
 import { PatientFormatter } from "./formatters";
 import { PatientService } from "./service";
@@ -53,7 +53,7 @@ const app = new Elysia({
     patientsIndexDto
   )
   .get(
-    "/:uuid", 
+    "/:uuid",
     async ({ params: { uuid } }) => {
       if (!uuid) {
         throw new BadRequestException("Hasta ID gereklidir");
@@ -65,9 +65,9 @@ const app = new Elysia({
     patientShowDto
   )
   .patch(
-    "/:id", // update
-    async ({ params: { id }, body }) => {
-      const updatedPatient = await PatientService.update(id, body);
+    "/:uuid", // update
+    async ({ params: { uuid }, body }) => {
+      const updatedPatient = await PatientService.update(uuid, body);
       const response = PatientFormatter.response(updatedPatient);
       return response;
     },
@@ -77,15 +77,15 @@ const app = new Elysia({
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.USER,
-        getEntityUuid: ({ params }: any) => params.id.toString(),
+        getEntityUuid: ({ params }: any) => params.uuid,
         getDescription: () => "Hasta bilgileri güncellendi",
       })
     )
   )
   .delete(
-    "/:id", // destroy
-    async ({ params: { id } }) => {
-      await PatientService.destroy(id);
+    "/:uuid", // destroy
+    async ({ params: { uuid } }) => {
+      await PatientService.destroy(uuid);
       return { message: "Hasta başarıyla silindi" };
     },
     // @ts-ignore - Complex middleware composition
@@ -100,9 +100,9 @@ const app = new Elysia({
     )
   )
   .post(
-    "/:id/restore", // restore
-    async ({ params: { id } }) => {
-      const patient = await PatientService.restore(id);
+    "/:uuid/restore", // restore
+    async ({ params: { uuid } }) => {
+      const patient = await PatientService.restore(uuid);
       const response = PatientFormatter.response(patient);
       return response;
     },

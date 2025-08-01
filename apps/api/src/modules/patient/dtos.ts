@@ -46,7 +46,7 @@ export const patientShowDto = {
 
 export const patientUpdateDto = {
     params: t.Object({
-        id: t.String(),
+        uuid: t.String(),
     }),
     body: t.Partial(
         t.Pick(PatientPlain, [
@@ -119,7 +119,7 @@ export const updatePatientDto = {
 
 export const patientDestroyDto = {
     params: t.Object({
-        id: t.String(),
+        uuid: t.String(),
     }),
     response: {
         200: t.Object({
