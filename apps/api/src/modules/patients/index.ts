@@ -1,4 +1,4 @@
-export { default as doctorController } from './controller';
+export { default as patientController } from './controller';
 export * from './dtos';
 export * from './formatters';
 export * from './service';

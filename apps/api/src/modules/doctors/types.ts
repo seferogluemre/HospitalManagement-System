@@ -1,47 +1,48 @@
-import type { Appointment, Doctor, Patient, User } from "@onlyjs/db/client";
+import type { Appointment, Doctor, User } from "@onlyjs/db/client";
 import type { Gender } from "@onlyjs/db/enums";
 
-export interface PatientCreatePayload {
+export interface DoctorCreatePayload {
   firstName: string;
   lastName: string;
   email: string;
   tcNo: string;
   gender: Gender;
 
-  // Patient specific fields
+  // Doctor specific fields
+  clinicId:number;
   phoneNumber?: string;
   address?: string;
   dateOfBirth?: Date;
-  familyDoctorId?: number;
+  specialty: string;
 }
 
-export interface PatientUpdatePayload {
+export interface DoctorUpdatePayload {
+  clinicId?: number;
   phoneNumber?: string;
   address?: string;
   dateOfBirth?: Date;
-  familyDoctorId?: number;
+  specialty?: string;
 }
 
-export interface PatientIndexQuery {
+export interface DoctorIndexQuery {
   page?: string;
   limit?: string;
   search?: string;
-  familyDoctorId?: number;
+  specialty?: string;
 }
 
-export interface PatientShowWhere {
-  id: string;
+export interface DoctorShowWhere {
+  uuid: string;
 }
 
-export type PatientWithRelations = Patient & {
+export type DoctorWithRelations = Doctor & {
   user: Pick<
     User,
     "id" | "firstName" | "lastName" | "email" | "tcNo" | "gender"
   >;
-  familyDoctor?: Pick<Doctor, "id" | "specialty"> | null;
 };
 
-export type PatientWithAppointments = PatientWithRelations & {
+export type DoctorWithAppointments = DoctorWithRelations & {
   appointments: Array<
     Appointment & {
       patient: {

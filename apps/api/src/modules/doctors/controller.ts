@@ -4,127 +4,116 @@ import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
 import { AuditLogAction, AuditLogEntity, withAuditLog } from "../audit-logs";
 import {
-  appointmentsGetDto,
-  patientCreateDto,
-  patientDestroyDto,
-  patientShowDto,
-  patientsIndexDto,
-  patientUpdateDto,
+  doctorCreateDto,
+  doctorDestroyDto,
+  doctorShowDto,
+  doctorsIndexDto,
+  doctorUpdateDto
 } from "./dtos";
-import { PatientFormatter } from "./formatters";
-import { PatientService } from "./service";
+import { DoctorFormatter } from "./formatters";
+import { DoctorService } from "./service";
 
 const app = new Elysia({
-  prefix: "/patients",
+  prefix: "/doctors",
   detail: {
-    tags: ["Patients"],
+    tags: ["Doctors"],
   },
 })
   .use(auth())
   .post(
     "",
     async ({ body }) => {
-      const patient = await PatientService.store(body);
-      return PatientFormatter.response(patient);
+      const doctor = await DoctorService.store(body);
+      return DoctorFormatter.response(doctor);
     },
     dtoWithMiddlewares(
-      patientCreateDto,
+      doctorCreateDto,
       withAuditLog({
         actionType: AuditLogAction.CREATE,
         entityType: AuditLogEntity.USER,
         getEntityUuid: (context: any) => context.body.tcNo,
-        getDescription: () => "Yeni hasta oluşturuldu",
+        getDescription: () => "Yeni doktor oluşturuldu",
       })
     )
   )
   .get(
     "",
     async ({ query }) => {
-      const patients = await PatientService.index({
+      const doctors = await DoctorService.index({
         search: query.search,
-        familyDoctorId: query.familyDoctorId
-          ? parseInt(query.familyDoctorId)
-          : undefined,
+        specialty: query.specialty,
         page: query.page,
         limit: query.limit,
       });
-      const response = patients.map(PatientFormatter.response);
+      const response = doctors.map(DoctorFormatter.response);
       return response;
     },
-    patientsIndexDto
+    doctorsIndexDto
   )
   .get(
     "/:uuid",
     async ({ params: { uuid } }) => {
       if (!uuid) {
-        throw new BadRequestException("Hasta ID gereklidir");
+        throw new BadRequestException("Doktor ID gereklidir");
       }
-      const patient = await PatientService.show({ uuid: uuid });
-      const response = PatientFormatter.response(patient);
+      const doctor = await DoctorService.show({ uuid: uuid });
+      const response = DoctorFormatter.response(doctor);
       return response;
     },
-    patientShowDto
+    doctorShowDto
   )
   .patch(
     "/:uuid", // update
     async ({ params: { uuid }, body }) => {
-      const updatedPatient = await PatientService.update(uuid, body);
-      const response = PatientFormatter.response(updatedPatient);
+      const updatedDoctor = await DoctorService.update(uuid, body);
+      const response = DoctorFormatter.response(updatedDoctor);
       return response;
     },
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
-      patientUpdateDto,
+      doctorUpdateDto,
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.USER,
         getEntityUuid: ({ params }: any) => params.uuid,
-        getDescription: () => "Hasta bilgileri güncellendi",
+        getDescription: () => "Doktor bilgileri güncellendi",
       })
     )
   )
   .delete(
     "/:uuid", // destroy
     async ({ params: { uuid } }) => {
-      await PatientService.destroy(uuid);
-      return { message: "Hasta başarıyla silindi" };
+      await DoctorService.destroy(uuid);
+      return { message: "Doktor başarıyla silindi" };
     },
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
-      patientDestroyDto,
+      doctorDestroyDto,
       withAuditLog({
         actionType: AuditLogAction.DELETE,
         entityType: AuditLogEntity.USER,
-        getEntityUuid: ({ params }: any) => params.id.toString(),
-        getDescription: () => "Hasta silindi",
+        getEntityUuid: ({ params }: any) => params.uuid,
+        getDescription: () => "Doktor silindi",
       })
     )
   )
   .post(
     "/:uuid/restore", // restore
     async ({ params: { uuid } }) => {
-      const patient = await PatientService.restore(uuid);
-      const response = PatientFormatter.response(patient);
+      const doctor = await DoctorService.restore(uuid);
+      const response = DoctorFormatter.response(doctor);
       return response;
     },
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
-      patientShowDto,
+      doctorShowDto,
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.USER,
-        getEntityUuid: ({ params }: any) => params.id.toString(),
-        getDescription: () => "Hasta geri yüklendi",
+        getEntityUuid: ({ params }: any) => params.uuid,
+        getDescription: () => "Doktor geri yüklendi",
       })
     )
   )
-  .get(
-    "/:uuid/appointments",
-    async ({ uuid }) => {
-      const patientAppointments = await PatientService.getAppointments(uuid);
-      return PatientFormatter.withAppointments(patientAppointments);
-    },
-    appointmentsGetDto
-  );
 
 export default app;

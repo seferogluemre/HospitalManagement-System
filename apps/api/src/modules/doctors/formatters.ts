@@ -1,36 +1,31 @@
-import type { PatientWithAppointments, PatientWithRelations } from "./types";
+import type { DoctorWithAppointments, DoctorWithRelations } from "./types";
 
-export abstract class PatientFormatter {
-  static response(patient: PatientWithRelations) {
+export abstract class DoctorFormatter {
+  static response(doctor: DoctorWithRelations) {
     return {
-      id: patient.id,
-      uuid: patient.uuid,
-      phoneNumber: patient.phoneNumber,
-      address: patient.address,
-      dateOfBirth: patient.dateOfBirth,
-      createdAt: patient.createdAt,
-      updatedAt: patient.updatedAt,
+      id: doctor.id,
+      uuid: doctor.uuid,
+      phoneNumber: doctor.phoneNumber ?? null,
+      address: doctor.address ?? null,
+      dateOfBirth: doctor.dateOfBirth ?? null,
+      specialty: doctor.specialty ?? null,
+      createdAt: doctor.createdAt ?? null,
+      updatedAt: doctor.updatedAt ?? null,
       user: {
-        id: patient.user.id,
-        firstName: patient.user.firstName,
-        lastName: patient.user.lastName,
-        email: patient.user.email,
-        tcNo: patient.user.tcNo,
-        gender: patient.user.gender,
+        id: doctor.user.id,
+        firstName: doctor.user.firstName,
+        lastName: doctor.user.lastName,
+        email: doctor.user.email,
+        tcNo: doctor.user.tcNo,
+        gender: doctor.user.gender,
       },
-      familyDoctor: patient.familyDoctor
-        ? {
-            id: patient.familyDoctor.id,
-            specialty: patient.familyDoctor.specialty,
-          }
-        : null,
     };
   }
 
-  static withAppointments(patientWithAppointments: PatientWithAppointments) {
+  static withAppointments(doctorWithAppointments: DoctorWithAppointments) {
     return {
-      ...this.response(patientWithAppointments),
-      appointments: patientWithAppointments.appointments.map((appointment) => ({
+      ...this.response(doctorWithAppointments),
+      appointments: doctorWithAppointments.appointments.map((appointment) => ({
         id: appointment.id,
         uuid: appointment.uuid,
         appointmentDate: appointment.appointmentDate,

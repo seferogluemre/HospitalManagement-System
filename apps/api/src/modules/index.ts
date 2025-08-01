@@ -5,7 +5,8 @@ import { locationsController } from './locations';
 import { postsController } from './posts';
 import { systemAdministrationController } from './system-administration';
 import { usersController } from './users';
-import { patientController } from './doctors';
+import { patientController } from './patients';
+import { doctorController } from './doctors';
 
 const app = new Elysia()
   .use(systemAdministrationController)
@@ -16,6 +17,7 @@ const app = new Elysia()
   .use(locationsController)
   .use(fileLibraryAssetsController)
   .use(patientController)
+  .use(doctorController)
   .get(
     '/',
     () => ({

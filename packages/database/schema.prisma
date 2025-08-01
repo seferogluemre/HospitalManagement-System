@@ -496,7 +496,7 @@ model Clinic {
 }
 
 model Doctor {
-  /// @prismabox.hide
+  /// @prismabox.hided
   id   Int    @id @default(autoincrement())
   uuid String @unique @default(uuid())
 
@@ -506,6 +506,14 @@ model Doctor {
 
   /// @prismabox.options{minLength:2,maxLength:100}
   specialty String @db.VarChar(100)
+
+  /// @prismabox.options{minLength:0,maxLength:20}
+  phoneNumber String? @map("phone_number") @db.VarChar(20)
+
+  /// @prismabox.options{minLength:0,maxLength:255}
+  address String? @db.VarChar(255)
+
+  dateOfBirth DateTime? @map("date_of_birth")
 
   clinic   Clinic @relation(fields: [clinicId], references: [id])
   /// @prismabox.hide
