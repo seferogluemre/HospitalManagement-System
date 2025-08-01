@@ -4,6 +4,7 @@ import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
 import { AuditLogAction, AuditLogEntity, withAuditLog } from "../audit-logs";
 import {
+  appointmentsGetDto,
   patientCreateDto,
   patientDestroyDto,
   patientShowDto,
@@ -116,6 +117,14 @@ const app = new Elysia({
         getDescription: () => "Hasta geri yüklendi",
       })
     )
+  )
+  .get(
+    "/:uuid/appointments",
+    async ({ uuid }) => {
+      const patientAppointments = await PatientService.getAppointments(uuid);
+      return PatientFormatter.withAppointments(patientAppointments);
+    },
+    appointmentsGetDto
   );
 
 export default app;

@@ -3,7 +3,6 @@ import { ConflictException, InternalServerErrorException, NotFoundException } fr
 import prisma from "@onlyjs/db";
 import { Prisma, type Patient } from "@onlyjs/db/client";
 import type { PatientCreatePayload, PatientIndexQuery, PatientUpdatePayload } from "./types";
-import { tr } from "@faker-js/faker";
 
 export abstract class PatientService {
     static async index(query?: PatientIndexQuery): Promise<Patient[]> {
@@ -302,6 +301,61 @@ export abstract class PatientService {
         } catch (error) {
             await HandleError.handlePrismaError(error, 'patient', 'update');
             throw error;
+        }
+    }
+
+    static async getAppointments(uuid: string) {
+        try {
+            const patient = await prisma.patient.findFirst({
+                where: { uuid },
+            })
+
+            if (!patient) {
+                throw NotFoundException("Hasta bulunamadı.")
+            }
+
+            const appointments = await prisma.appointment.findMany({
+                where: {
+                    patientId: uuid
+                },
+                select: {
+                    patient: {
+                        select: {
+                            id: true,
+                            user: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true,
+                                    email: true,
+                                    gender: true,
+                                }
+                            }
+                        }
+                    },
+                    completedAt: true,
+                    appointmentDate: true,
+                    notes: true,
+                    description: true,
+                    doctor: {
+                        select: {
+                            id: true,
+                            user: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true,
+                                    email: true,
+                                    gender: true,
+                                }
+                            }
+                        }
+                    },
+                }
+            })
+
+            console.log("Hasta randevuları", appointments)
+            return appointments;
+        } catch (error) {
+            await HandleError.handlePrismaError(error, "patient", "find")
         }
     }
 

@@ -3,10 +3,11 @@ import type { ControllerHook } from "#utils/elysia-types.ts";
 import { DoctorPlain } from "@onlyjs/db/prismabox/Doctor";
 import { UserPlain } from "@onlyjs/db/prismabox/User";
 import { t } from "elysia";
+import { AppointmentPlain } from "../../../../../packages/database/prismabox/Appointment";
 import { PatientPlain } from "../../../../../packages/database/prismabox/Patient";
 
 export const patientResponseSchema = t.Composite([
-    t.Omit(PatientPlain, ["userId", "familyDoctorId","deletedAt"]),
+    t.Omit(PatientPlain, ["userId", "familyDoctorId", "deletedAt"]),
     t.Object({
         user: t.Pick(UserPlain, ["id", "firstName", "lastName", "email", "tcNo", "gender"]),
         familyDoctor: t.Nullable(
@@ -131,5 +132,36 @@ export const patientDestroyDto = {
         summary: 'Delete Patient',
     },
 } satisfies ControllerHook;
+
+const appointmentResponseSchema = t.Composite([
+    t.Pick(AppointmentPlain,
+        ["notes", "completedAt", "appointmentDate", "status"]
+    ),
+    t.Object({
+        patient: t.Object({
+            id: t.Number(),
+            user: t.Pick(UserPlain, ["firstName", "lastName", "email", "gender"])
+        }),
+        doctor: t.Object({
+            id: t.Number(),
+            user: t.Pick(UserPlain, ['firstName', 'lastName', 'email', 'gender'])
+        })
+    })
+])
+
+export const appointmentsGetDto = {
+    params: t.Object({
+        uuid: t.String(),
+    }),
+    response: {
+        200:t.Array(appointmentResponseSchema),
+        404: errorResponseDto[404],
+    },
+    detail: {
+        summary: 'Get Patient Appointments',
+    },
+}
+
+
 
 export const patientCreateResponseDto = patientCreateDto.response['200'];

@@ -604,9 +604,9 @@ model Appointment {
   id   Int    @id @default(autoincrement())
   uuid String @unique @default(uuid())
 
-  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  patient   Patient @relation(fields: [patientId], references: [uuid], onDelete: Cascade)
   /// @prismabox.hide
-  patientId Int     @map("patient_id")
+  patientId String     @map("patient_id")
 
   doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   /// @prismabox.hide
