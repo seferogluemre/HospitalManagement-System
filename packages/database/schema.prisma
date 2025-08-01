@@ -136,7 +136,7 @@ model User {
   doctors        Doctor[]
   patients       Patient[]
   secretaries    Secretary[]
-  announcements   Announcement[] @relation("AnnouncementAuthor")
+  announcements  Announcement[] @relation("AnnouncementAuthor")
 
   @@index([deletedAt])
   @@map("users")
@@ -524,7 +524,7 @@ model Doctor {
   /// @prismabox.input.hide
   deletedAt      DateTime?     @map("deleted_at")
   familyPatients Patient[]     @relation("FamilyDoctorPatients")
-  appointments    Appointment[]
+  appointments   Appointment[]
 
   @@index([userId])
   @@index([clinicId])
@@ -576,10 +576,18 @@ model Secretary {
 
   clinics SecretaryClinic[]
 
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
+  /// @prismabox.options{minLength:0,maxLength:20}
+  phoneNumber String? @map("phone_number") @db.VarChar(20)
+
+  /// @prismabox.options{minLength:0,maxLength:255}
+  address String? @db.VarChar(255)
+
+  dateOfBirth DateTime? @map("date_of_birth")
+
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
   /// @prismabox.input.hide
-  deletedAt   DateTime?     @map("deleted_at")
+  deletedAt           DateTime?     @map("deleted_at")
   createdAppointments Appointment[]
 
   @@index([userId])
@@ -614,7 +622,7 @@ model Appointment {
 
   patient   Patient @relation(fields: [patientId], references: [uuid], onDelete: Cascade)
   /// @prismabox.hide
-  patientId String     @map("patient_id")
+  patientId String  @map("patient_id")
 
   doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   /// @prismabox.hide
@@ -672,9 +680,8 @@ model Announcement {
   updatedAt DateTime  @updatedAt @map("updated_at")
   /// @prismabox.input.hide
   deletedAt DateTime? @map("deleted_at")
- 
+
   @@index([isActive])
   @@index([deletedAt])
   @@map("announcements")
 }
-
