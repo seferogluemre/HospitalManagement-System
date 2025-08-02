@@ -1,44 +1,28 @@
-export interface AnnouncementCreatePayload {
+export interface TreatmentCreatePayload {
   title: string;
-  content: string;
-  isActive?: boolean;
-  targetRoles?: string[];
-  authorId: string;
+  notes?: string;
+  diagnosis?: string;
+  appointmentId: string;
+  doctorId: number;
 }
 
-export interface AnnouncementUpdatePayload {
+export interface TreatmentUpdatePayload {
   title?: string;
-  content?: string;
-  isActive?: boolean;
-  targetRoles?: string[];
+  notes?: string;
+  diagnosis?: string;
 }
 
-export interface AnnouncementIndexQuery {
+// Query filters
+export interface TreatmentIndexQuery {
   page?: string;
   limit?: string;
   search?: string;
-  isActive?: string;
-  authorId?: string;
-  targetRole?: string;
+  doctorId?: string;
+  appointmentId?: string;
+  aiStatus?: string;
 }
 
-export interface AnnouncementShowWhere {
+// Show where condition
+export interface TreatmentShowWhere {
   uuid: string;
-}
-
-export interface Announcement {
-  id: number;
-  uuid: string;
-  title: string;
-  content: string;
-  isActive: boolean;
-  targetRoles: string[];
-  createdAt: Date;
-  updatedAt: Date;
-  author?: {
-    uuid: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
 }

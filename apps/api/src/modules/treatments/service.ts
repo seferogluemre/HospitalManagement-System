@@ -1,60 +1,90 @@
 import { HandleError } from "#shared/error/index.ts";
 import { NotFoundException } from "#utils/http-errors.ts";
 import prisma from "@onlyjs/db";
-import { Prisma, type Announcement } from "@onlyjs/db/client";
+import { Prisma, type Treatment } from "@onlyjs/db/client";
 import type {
-  AnnouncementCreatePayload,
-  AnnouncementIndexQuery,
-  AnnouncementUpdatePayload,
+  TreatmentCreatePayload,
+  TreatmentIndexQuery,
+  TreatmentUpdatePayload,
 } from "./types";
 
-export abstract class AnnouncementService {
-  static async index(query?: AnnouncementIndexQuery): Promise<Announcement[]> {
+export abstract class TreatmentService {
+  static async index(query?: TreatmentIndexQuery): Promise<Treatment[]> {
     try {
       const filterQuery = query ? { ...query } : undefined;
 
-      const where: Prisma.AnnouncementWhereInput = {
+      const where: Prisma.TreatmentWhereInput = {
         deletedAt: null,
       };
 
       if (filterQuery?.search) {
         where.OR = [
           { title: { contains: filterQuery.search, mode: "insensitive" } },
-          { content: { contains: filterQuery.search, mode: "insensitive" } },
+          { notes: { contains: filterQuery.search, mode: "insensitive" } },
+          { diagnosis: { contains: filterQuery.search, mode: "insensitive" } },
           {
-            author: {
-              OR: [
-                { firstName: { contains: filterQuery.search, mode: 'insensitive' } },
-                { lastName: { contains: filterQuery.search, mode: 'insensitive' } },
-              ]
+            doctor: {
+              user: {
+                OR: [
+                  { firstName: { contains: filterQuery.search, mode: 'insensitive' } },
+                  { lastName: { contains: filterQuery.search, mode: 'insensitive' } },
+                ]
+              }
             }
           },
         ];
       }
 
-      if (filterQuery?.isActive !== undefined) {
-        where.isActive = filterQuery.isActive === "true";
+      if (filterQuery?.doctorId) {
+        where.doctorId = parseInt(filterQuery.doctorId);
       }
 
-      if (filterQuery?.authorId) {
-        where.authorId = filterQuery.authorId;
+      if (filterQuery?.appointmentId) {
+        where.appointmentId = filterQuery.appointmentId;
       }
 
-      if (filterQuery?.targetRole) {
-        where.targetRoles = {
-          has: filterQuery.targetRole,
-        };
+      if (filterQuery?.aiStatus) {
+        where.aiStatus = filterQuery.aiStatus;
       }
 
-      return prisma.announcement.findMany({
+      return prisma.treatment.findMany({
         where,
         include: {
-          author: {
+          doctor: {
             select: {
               id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
+              uuid: true,
+              specialty: true,
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                },
+              },
+              clinic: {
+                select: {
+                  uuid: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          appointment: {
+            select: {
+              uuid: true,
+              appointmentDate: true,
+              patient: {
+                select: {
+                  uuid: true,
+                  user: {
+                    select: {
+                      firstName: true,
+                      lastName: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -63,187 +93,301 @@ export abstract class AnnouncementService {
         },
       });
     } catch (error) {
-      await HandleError.handlePrismaError(error, "announcement", "find");
+      await HandleError.handlePrismaError(error, "treatment", "find");
       throw error;
     }
   }
 
   static async show(where: { uuid: string }) {
     try {
-      const announcement = await prisma.announcement.findFirst({
+      const treatment = await prisma.treatment.findFirst({
         where: {
           uuid: where.uuid,
           deletedAt: null,
         },
         include: {
-          author: {
+          doctor: {
             select: {
               id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
+              uuid: true,
+              specialty: true,
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                },
+              },
+              clinic: {
+                select: {
+                  uuid: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          appointment: {
+            select: {
+              uuid: true,
+              appointmentDate: true,
+              patient: {
+                select: {
+                  uuid: true,
+                  user: {
+                    select: {
+                      firstName: true,
+                      lastName: true,
+                      email: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
       });
 
-      if (!announcement) {
-        throw new NotFoundException("Duyuru bulunamadı");
+      if (!treatment) {
+        throw new NotFoundException("Treatment bulunamadı");
       }
 
-      return announcement;
+      return treatment;
     } catch (error) {
-      await HandleError.handlePrismaError(error, "announcement", "find");
+      await HandleError.handlePrismaError(error, "treatment", "find");
       throw error;
     }
   }
 
-  static async store(
-    payload: AnnouncementCreatePayload
-  ): Promise<Announcement> {
+  static async store(payload: TreatmentCreatePayload): Promise<Treatment> {
     try {
-      // Validate author exists
-      const author = await prisma.user.findFirst({
+      // Validate appointment exists
+      const appointment = await prisma.appointment.findFirst({
         where: {
-          id: payload.authorId, 
+          uuid: payload.appointmentId,
           deletedAt: null,
         },
       });
 
-      if (!author) {
-        throw new NotFoundException("Yazar bulunamadı");
+      if (!appointment) {
+        throw new NotFoundException("Appointment bulunamadı");
       }
 
-      const announcement = await prisma.announcement.create({
+      // Validate doctor exists
+      const doctor = await prisma.doctor.findFirst({
+        where: {
+          id: payload.doctorId,
+          deletedAt: null,
+        },
+      });
+
+      if (!doctor) {
+        throw new NotFoundException("Doktor bulunamadı");
+      }
+
+      // Check appointment-doctor match
+      if (appointment.doctorId !== payload.doctorId) {
+        throw new Error("Bu appointment bu doktora ait değil");
+      }
+
+      const treatment = await prisma.treatment.create({
         data: {
           title: payload.title,
-          content: payload.content,
-          isActive: payload.isActive ?? true,
-          targetRoles: payload.targetRoles ?? [],
-          authorId: payload.authorId,
+          notes: payload.notes,
+          diagnosis: payload.diagnosis,
+          appointmentId: payload.appointmentId,
+          doctorId: payload.doctorId,
         },
         include: {
-          author: {
+          doctor: {
             select: {
               id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
+              uuid: true,
+              specialty: true,
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          appointment: {
+            select: {
+              uuid: true,
+              appointmentDate: true,
+              patient: {
+                select: {
+                  uuid: true,
+                  user: {
+                    select: {
+                      firstName: true,
+                      lastName: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
       });
 
-      return announcement;
+      return treatment;
     } catch (error) {
-      await HandleError.handlePrismaError(error, "announcement", "create");
+      await HandleError.handlePrismaError(error, "treatment", "create");
       throw error;
     }
   }
 
   static async update(
     uuid: string,
-    payload: AnnouncementUpdatePayload
-  ): Promise<Announcement> {
+    payload: TreatmentUpdatePayload
+  ): Promise<Treatment> {
     try {
-      const announcement = await prisma.announcement.findFirst({
+      const treatment = await prisma.treatment.findFirst({
         where: {
           uuid: uuid,
           deletedAt: null,
         },
       });
 
-      if (!announcement) {
-        throw new NotFoundException("Duyuru bulunamadı");
+      if (!treatment) {
+        throw new NotFoundException("Treatment bulunamadı");
       }
 
-      const updatedAnnouncement = await prisma.announcement.update({
+      const updatedTreatment = await prisma.treatment.update({
         where: { uuid: uuid },
         data: {
           ...payload,
         },
         include: {
-          author: {
+          doctor: {
             select: {
               id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
+              uuid: true,
+              specialty: true,
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          appointment: {
+            select: {
+              uuid: true,
+              appointmentDate: true,
+              patient: {
+                select: {
+                  uuid: true,
+                  user: {
+                    select: {
+                      firstName: true,
+                      lastName: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
       });
 
-      return updatedAnnouncement;
+      return updatedTreatment;
     } catch (error) {
-      await HandleError.handlePrismaError(error, "announcement", "update");
+      await HandleError.handlePrismaError(error, "treatment", "update");
       throw error;
     }
   }
 
   static async destroy(uuid: string): Promise<void> {
     try {
-      const announcement = await prisma.announcement.findFirst({
+      const treatment = await prisma.treatment.findFirst({
         where: {
           uuid: uuid,
           deletedAt: null,
         },
       });
 
-      if (!announcement) {
-        throw new NotFoundException("Duyuru bulunamadı");
+      if (!treatment) {
+        throw new NotFoundException("Treatment bulunamadı");
       }
 
-      await prisma.announcement.update({
+      await prisma.treatment.update({
         where: { uuid: uuid },
         data: { deletedAt: new Date() },
       });
     } catch (error) {
-      await HandleError.handlePrismaError(error, "announcement", "delete");
+      await HandleError.handlePrismaError(error, "treatment", "delete");
       throw error;
     }
   }
 
-  static async restore(uuid: string): Promise<Announcement> {
+  static async restore(uuid: string): Promise<Treatment> {
     try {
-      const announcement = await prisma.announcement.findFirst({
+      const treatment = await prisma.treatment.findFirst({
         where: { uuid: uuid, deletedAt: { not: null } },
       });
 
-      if (!announcement) {
-        throw new NotFoundException("Duyuru bulunamadı veya zaten aktif");
+      if (!treatment) {
+        throw new NotFoundException("Treatment bulunamadı veya zaten aktif");
       }
 
-      return await prisma.announcement.update({
+      return await prisma.treatment.update({
         where: { uuid: uuid },
         data: { deletedAt: null },
         include: {
-          author: {
+          doctor: {
             select: {
               id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
+              uuid: true,
+              specialty: true,
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          appointment: {
+            select: {
+              uuid: true,
+              appointmentDate: true,
+              patient: {
+                select: {
+                  uuid: true,
+                  user: {
+                    select: {
+                      firstName: true,
+                      lastName: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
       });
     } catch (error) {
-      await HandleError.handlePrismaError(error, "announcement", "update");
+      await HandleError.handlePrismaError(error, "treatment", "update");
       throw error;
     }
   }
 
-  // Helper methods for role-based filtering
-  static async getByTargetRole(role: string): Promise<Announcement[]> {
-    return this.index({ targetRole: role, isActive: "true" });
+  // Helper methods
+  static async getByDoctor(doctorId: number): Promise<Treatment[]> {
+    return this.index({ doctorId: doctorId.toString() });
   }
 
-  static async getActiveAnnouncements(): Promise<Announcement[]> {
-    return this.index({ isActive: "true" });
+  static async getByAppointment(appointmentId: string): Promise<Treatment[]> {
+    return this.index({ appointmentId });
   }
 
-  static async getByAuthor(authorId: string): Promise<Announcement[]> {
-    return this.index({ authorId });
+  static async getByAIStatus(aiStatus: string): Promise<Treatment[]> {
+    return this.index({ aiStatus });
   }
 }

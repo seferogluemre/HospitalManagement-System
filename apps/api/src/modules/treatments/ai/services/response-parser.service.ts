@@ -2,7 +2,6 @@ import { AI_CONSTANTS } from "#modules/treatments/constants/constants.ts";
 import type { ITreatmentAIResponse } from "../types";
 
 export class ResponseParserService {
-
   static parseAIResponse(rawResponse: string): {
     success: boolean;
     data?: ITreatmentAIResponse;
