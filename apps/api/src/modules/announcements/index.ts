@@ -1,4 +1,4 @@
-export { default as appointmentController } from './controller';
+export { default as announcementController } from './controller';
 export * from './dtos';
 export * from './formatters';
 export * from './service';

@@ -10,6 +10,7 @@ import { postsController } from './posts';
 import { secretaryController } from './secretaries';
 import { systemAdministrationController } from './system-administration';
 import { usersController } from './users';
+import { announcementController } from './announcements';
 
 const app = new Elysia()
   .use(systemAdministrationController)
@@ -24,6 +25,7 @@ const app = new Elysia()
   .use(secretaryController)
   .use(clinicController)
   .use(appointmentController)
+  .use(announcementController)
   .get(
     '/',
     () => ({
