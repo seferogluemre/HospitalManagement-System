@@ -4,18 +4,14 @@ import { AnnouncementPlain } from "@onlyjs/db/prismabox/Announcement";
 import { t } from "elysia";
 
 export const announcementResponseSchema = t.Composite([
-  t.Omit(AnnouncementPlain, [
-    "id",
-    "authorId",
-    "deletedAt",
-  ]),
+  t.Omit(AnnouncementPlain, ["id", "authorId", "deletedAt"]),
   t.Object({
     id: t.Number(),
     author: t.Object({
-      id: t.String(),
-      firstName: t.String(),
-      lastName: t.String(),
-      email: t.String(),
+      uuid: t.Optional(t.String()),
+      firstName: t.Optional(t.String()),
+      lastName: t.Optional(t.String()),
+      email: t.Optional(t.String()),
     }),
   }),
 ]);

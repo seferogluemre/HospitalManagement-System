@@ -26,22 +26,19 @@ export interface AnnouncementShowWhere {
   uuid: string;
 }
 
-
 export interface Announcement {
   id: number;
   uuid: string;
   title: string;
   content: string;
-  isActive: boolean,
-  targetRoles: string[],
-  createdAt: Date,
-  updatedAt: Date,
-  author: {
-    uuid: string,
-    user: {
-      firstName: string,
-      lastName: string,
-      email: string,
-    },
-  },
+  isActive: boolean;
+  targetRoles: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  author?: {
+    uuid: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
 }

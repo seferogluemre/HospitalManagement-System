@@ -12,12 +12,10 @@ export abstract class AnnouncementFormatter {
       createdAt: announcement.createdAt,
       updatedAt: announcement.updatedAt,
       author: {
-        uuid: announcement.author.uuid,
-        user: {
-          firstName: announcement.author?.user?.firstName,
-          lastName: announcement.author?.user?.lastName,
-          email: announcement.author?.user?.email,
-        },
+        uuid: announcement.author?.uuid,
+        firstName: announcement.author?.firstName,
+        lastName: announcement.author?.lastName,
+        email: announcement.author?.email,
       },
     };
   }
