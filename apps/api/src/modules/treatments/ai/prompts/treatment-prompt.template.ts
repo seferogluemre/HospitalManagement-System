@@ -100,7 +100,6 @@ SADECE JSON FORMATINDA YANIT VER, BAŞKA BİR ŞEY YAZMA.
 
         return complaint;
     }
-
   
     static checkEmergencyKeywords(complaint: string): boolean {
         const lowerComplaint = complaint.toLowerCase();
@@ -109,7 +108,6 @@ SADECE JSON FORMATINDA YANIT VER, BAŞKA BİR ŞEY YAZMA.
         );
     }
 
-  
     static buildEmergencyPrompt(): string {
         return `
 BU DURUM ACİL!

@@ -11,7 +11,6 @@ export class PromptBuilderService {
         return this.buildNormalPrompt(context);
     }
 
-
     private static buildNormalPrompt(context: ITreatmentPromptContext): string {
         const parts = [
             TreatmentPromptTemplate.SYSTEM_ROLE,
@@ -33,13 +32,11 @@ export class PromptBuilderService {
         ].join('\n\n');
     }
 
-
     private static buildDoctorNotesSection(notes?: string): string {
         if (!notes) return '';
 
         return `DOKTOR NOTLARI:\n${notes}`;
     }
-
 
     static validatePromptLength(prompt: string): {
         isValid: boolean;
@@ -54,7 +51,6 @@ export class PromptBuilderService {
             maxLength
         };
     }
-
 
     static previewPrompt(context: ITreatmentPromptContext): {
         prompt: string;
