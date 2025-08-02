@@ -118,8 +118,8 @@ export const treatmentUpdateDto = {
   }),
   body: t.Partial(
     t.Object({
-      title: t.String({ minLength: 2, maxLength: 255 }),
-      notes: t.String({ maxLength: 1000 }),
+      title: t.String(),
+      notes: t.String(),
       diagnosis: t.String(),
     })
   ),
