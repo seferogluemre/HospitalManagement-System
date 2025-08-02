@@ -7,7 +7,6 @@ export abstract class TreatmentFormatter {
       notes: treatment.notes || null,
       diagnosis: treatment.diagnosis || null,
       
-      // AI fields
       patientComplaint: treatment.patientComplaint || null,
       aiTreatment: treatment.aiTreatment || null,
       aiRecommendations: treatment.aiRecommendations || null,
@@ -17,11 +16,9 @@ export abstract class TreatmentFormatter {
       aiReviewedAt: treatment.aiReviewedAt || null,
       aiReviewNotes: treatment.aiReviewNotes || null,
       
-      // Timestamps
       createdAt: treatment.createdAt,
       updatedAt: treatment.updatedAt,
       
-      // Relations
       doctor: {
         id: treatment.doctor.id,
         uuid: treatment.doctor.uuid,

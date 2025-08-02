@@ -1,6 +1,3 @@
-/**
- * ai configuration for treatments module
- */
 export const AIConfig = {
     GEMINI: {
         API_KEY: process.env.GEMINI_API_KEY!,

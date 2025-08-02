@@ -4,12 +4,26 @@ export interface TreatmentCreatePayload {
   diagnosis?: string;
   appointmentId: string;
   doctorId: number;
+  patientComplaint?: string;
+  aiTreatment?: string;
+  aiRecommendations?: string;
+  aiFollowUp?: string;
+  aiStatus?: string;
+  aiReviewNotes?: string;
 }
 
 export interface TreatmentUpdatePayload {
   title?: string;
   notes?: string;
   diagnosis?: string;
+  // AI Fields
+  patientComplaint?: string;
+  aiTreatment?: string;
+  aiRecommendations?: string;
+  aiFollowUp?: string;
+  aiStatus?: string;
+  aiReviewedAt?: Date;
+  aiReviewNotes?: string;
 }
 
 // Query filters
@@ -22,7 +36,6 @@ export interface TreatmentIndexQuery {
   aiStatus?: string;
 }
 
-// Show where condition
 export interface TreatmentShowWhere {
   uuid: string;
 }

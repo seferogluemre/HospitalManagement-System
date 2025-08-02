@@ -20,10 +20,10 @@ export const treatmentResponseSchema = t.Composite([
         lastName: t.String(),
         email: t.String(),
       }),
-      clinic: t.Object({
+      clinic: t.Optional(t.Object({
         uuid: t.String(),
         name: t.String(),
-      }),
+      })),
     }),
     appointment: t.Object({
       uuid: t.String(),
