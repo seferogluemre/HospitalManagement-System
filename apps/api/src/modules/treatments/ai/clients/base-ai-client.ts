@@ -40,7 +40,6 @@ export abstract class BaseAIClient implements IAIClient {
   getModelInfo(): string {
     return this.config.model;
   }
-
  
   protected validateConfig(): void {
     if (!this.config.apiKey) {
@@ -51,7 +50,6 @@ export abstract class BaseAIClient implements IAIClient {
       throw new Error(`API URL is required for ${this.getModelInfo()}`);
     }
   }
-
 
   protected async withRetry<T>(
     operation: () => Promise<T>,

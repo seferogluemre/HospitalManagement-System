@@ -40,7 +40,7 @@ export class GeminiClient extends BaseAIClient {
         }
       ],
       generationConfig: {
-        temperature: request.temperature || 0.7,
+        temperature: request.temperature || 0.8,
         maxOutputTokens: request.maxTokens || 1000,
         topK: 40,
         topP: 0.95
@@ -119,7 +119,7 @@ export class GeminiClient extends BaseAIClient {
     }
   }
 
-  getModelInfo(): string {
+  override getModelInfo(): string {
     return `Gemini (${this.config.model})`;
   }
 }
