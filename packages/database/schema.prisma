@@ -522,7 +522,7 @@ model Doctor {
   deletedAt      DateTime?     @map("deleted_at")
   familyPatients Patient[]     @relation("FamilyDoctorPatients")
   appointments   Appointment[]
-  Treatment      Treatment[]
+  treatments     Treatment[]
 
   @@index([userId])
   @@index([clinicId])
@@ -642,10 +642,10 @@ model Appointment {
   /// @prismabox.hide
   createdBySecretaryId Int?       @map("created_by_secretary_id")
 
-  createdAt DateTime    @default(now()) @map("created_at")
-  updatedAt DateTime    @updatedAt @map("updated_at")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
   /// @prismabox.input.hide
-  deletedAt DateTime?   @map("deleted_at")
+  deletedAt  DateTime?   @map("deleted_at")
   treatments Treatment[]
 
   @@index([patientId])
@@ -698,6 +698,28 @@ model Treatment {
 
   diagnosis String? @db.Text
 
+  // AI RELATED FIELDS (SADECE BUSINESS ALANLARI)
+  /// Hasta şikayeti ve semptomlar
+  patientComplaint String? @map("patient_complaint") @db.Text
+
+  /// AI'nin önerdiği tedavi yöntemi  
+  aiTreatment String? @map("ai_treatment") @db.Text
+
+  /// AI'nin önerdiği genel öneriler
+  aiRecommendations String? @map("ai_recommendations") @db.Text
+
+  /// AI'nin önerdiği takip süreci
+  aiFollowUp String? @map("ai_follow_up") @db.Text
+
+  /// AI raporunun durumu (generated, approved, rejected)
+  aiStatus String? @default("generated") @map("ai_status") @db.VarChar(20)
+
+  /// Doktor AI raporunu ne zaman gözden geçirdi
+  aiReviewedAt DateTime? @map("ai_reviewed_at")
+
+  /// Doktor AI raporu hakkında notlar
+  aiReviewNotes String? @map("ai_review_notes") @db.Text
+
   doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   /// @prismabox.hide
   doctorId Int    @map("doctor_id")
@@ -711,5 +733,6 @@ model Treatment {
   deletedAt DateTime? @map("deleted_at")
 
   @@index([deletedAt])
+  @@index([aiStatus])
   @@map("treatments")
 }
