@@ -3,120 +3,211 @@ import { BadRequestException } from "#utils/http-errors.ts";
 import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
 import { AuditLogAction, AuditLogEntity, withAuditLog } from "../audit-logs";
+import { AIReportService } from "./ai/services/ai-report.service";
 import {
-  announcementCreateDto,
-  announcementDestroyDto,
-  announcementShowDto,
-  announcementsIndexDto,
-  announcementUpdateDto,
+  treatmentAIHealthDto,
+  treatmentAIRegenerateDto,
+  treatmentAIReviewDto,
+  treatmentAIStatsDto,
+  treatmentCreateDto,
+  treatmentCreateWithAIDto,
+  treatmentDestroyDto,
+  treatmentShowDto,
+  treatmentsIndexDto,
+  treatmentUpdateDto,
 } from "./dtos";
-import { AnnouncementFormatter } from "./formatters";
-import { AnnouncementService } from "./service";
-import type { Announcement } from "./types";
+import { TreatmentFormatter } from "./formatters";
+import { TreatmentService } from "./service";
 
 const app = new Elysia({
-  prefix: "/announcements",
+  prefix: "/treatments",
   detail: {
-    tags: ["Announcements"],
+    tags: ["Treatments"],
   },
 })
   .use(auth())
+  
+  // Normal CRUD Operations
   .post(
     "",
     async ({ body }) => {
-      const announcement = await AnnouncementService.store(body);
-      return AnnouncementFormatter.response(announcement as unknown as Announcement);
+      const treatment = await TreatmentService.store(body);
+      return TreatmentFormatter.response(treatment);
     },
     dtoWithMiddlewares(
-      announcementCreateDto,
+      treatmentCreateDto,
       withAuditLog({
         actionType: AuditLogAction.CREATE,
-        entityType: AuditLogEntity.ANNOUNCEMENT,
+        entityType: AuditLogEntity.APPOINTMENT, // Treatment entity yok, Appointment kullanıyoruz
         getEntityUuid: (context: any) => context.response?.uuid || "unknown",
-        getDescription: () => "Yeni duyuru oluşturuldu",
+        getDescription: () => "Yeni treatment oluşturuldu",
       })
     )
   )
+  
+  // AI Destekli Treatment Oluşturma
+  .post(
+    "/ai-generate",
+    async ({ body }) => {
+      // AI services'den import ediyoruz
+      const TreatmentServiceAI = (await import("./services")).TreatmentService;
+      const result = await TreatmentServiceAI.createWithAI(body);
+      
+      return {
+        treatment: TreatmentFormatter.response(result.treatment),
+        aiGenerated: result.aiGenerated,
+        aiConfidence: result.aiConfidence,
+        aiStatus: result.aiStatus,
+      };
+    },
+    dtoWithMiddlewares(
+      treatmentCreateWithAIDto,
+      withAuditLog({
+        actionType: AuditLogAction.CREATE,
+        entityType: AuditLogEntity.APPOINTMENT,
+        getEntityUuid: (context: any) => context.response?.treatment?.uuid || "unknown",
+        getDescription: () => "AI destekli treatment oluşturuldu",
+      })
+    )
+  )
+  
   .get(
     "",
     async ({ query }) => {
-      const announcements = await AnnouncementService.index({
+      const treatments = await TreatmentService.index({
         search: query.search,
-        isActive: query.isActive,
-        authorId: query.authorId,
-        targetRole: query.targetRole,
+        doctorId: query.doctorId,
+        appointmentId: query.appointmentId,
+        aiStatus: query.aiStatus,
         page: query.page,
         limit: query.limit,
       });
-      const response = announcements.map((announcement: any) => AnnouncementFormatter.response(announcement));
+      const response = treatments.map((treatment: any) => TreatmentFormatter.response(treatment));
       return response;
     },
-    announcementsIndexDto
+    treatmentsIndexDto
   )
+  
   .get(
     "/:uuid",
     async ({ params: { uuid } }) => {
       if (!uuid) {
-        throw new BadRequestException("Duyuru ID gereklidir");
+        throw new BadRequestException("Treatment ID gereklidir");
       }
-      const announcement = await AnnouncementService.show({ uuid: uuid });
-      const response = AnnouncementFormatter.response(announcement as unknown as Announcement);
+      const treatment = await TreatmentService.show({ uuid: uuid });
+      const response = TreatmentFormatter.response(treatment);
       return response;
     },
-    announcementShowDto
+    treatmentShowDto
   )
   .patch(
-    "/:uuid", // update
+    "/:uuid",
     async ({ params: { uuid }, body }) => {
-      const updatedAnnouncement = await AnnouncementService.update(uuid, body);
-      const response = AnnouncementFormatter.response(updatedAnnouncement as unknown as Announcement);
+      const updatedTreatment = await TreatmentService.update(uuid, body);
+      const response = TreatmentFormatter.response(updatedTreatment);
       return response;
     },
-    // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
-      announcementUpdateDto,
+      treatmentUpdateDto,
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
-        entityType: AuditLogEntity.ANNOUNCEMENT,
+        entityType: AuditLogEntity.APPOINTMENT,
         getEntityUuid: ({ params }: any) => params.uuid,
-        getDescription: () => "Duyuru bilgileri güncellendi",
+        getDescription: () => "Treatment bilgileri güncellendi",
       })
     )
   )
   .delete(
-    "/:uuid", // destroy
+    "/:uuid",
     async ({ params: { uuid } }) => {
-      await AnnouncementService.destroy(uuid);
-      return { message: "Duyuru başarıyla silindi" };
+      await TreatmentService.destroy(uuid);
+      return { message: "Treatment başarıyla silindi" };
     },
-    // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
-      announcementDestroyDto,
+      treatmentDestroyDto,
       withAuditLog({
         actionType: AuditLogAction.DELETE,
-        entityType: AuditLogEntity.ANNOUNCEMENT,
+        entityType: AuditLogEntity.APPOINTMENT,
         getEntityUuid: ({ params }: any) => params.uuid,
-        getDescription: () => "Duyuru silindi",
+        getDescription: () => "Treatment silindi",
       })
     )
   )
   .post(
-    "/:uuid/restore", // restore
+    "/:uuid/restore",
     async ({ params: { uuid } }) => {
-      const announcement = await AnnouncementService.restore(uuid);
-      const response = AnnouncementFormatter.response(announcement as unknown as Announcement);
+      const treatment = await TreatmentService.restore(uuid);
+      const response = TreatmentFormatter.response(treatment);
       return response;
     },
-    // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
-      announcementShowDto,
+      treatmentShowDto,
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
-        entityType: AuditLogEntity.ANNOUNCEMENT,
+        entityType: AuditLogEntity.APPOINTMENT,
         getEntityUuid: ({ params }: any) => params.uuid,
-        getDescription: () => "Duyuru geri yüklendi",
+        getDescription: () => "Treatment geri yüklendi",
       })
     )
+  )
+  
+  // AI Özel Endpoints
+  .post(
+    "/:uuid/ai-review",
+    async ({ params: { uuid }, body }) => {
+      const TreatmentServiceAI = (await import("./services")).TreatmentService;
+      const treatment = await TreatmentServiceAI.reviewAIReport(uuid, body);
+      return TreatmentFormatter.response(treatment);
+    },
+    dtoWithMiddlewares(
+      treatmentAIReviewDto,
+      withAuditLog({
+        actionType: AuditLogAction.UPDATE,
+        entityType: AuditLogEntity.APPOINTMENT,
+        getEntityUuid: ({ params }: any) => params.uuid,
+        getDescription: ({ body }: any) => body.approved ? "AI raporu onaylandı" : "AI raporu reddedildi",
+      })
+    )
+  )
+  
+  .post(
+    "/:uuid/ai-regenerate",
+    async ({ params: { uuid } }) => {
+      const TreatmentServiceAI = (await import("./services")).TreatmentService;
+      const result = await TreatmentServiceAI.regenerateAIReport(uuid);
+      
+      return {
+        success: result.success,
+        treatment: result.treatment ? TreatmentFormatter.response(result.treatment) : undefined,
+        error: result.error,
+      };
+    },
+    dtoWithMiddlewares(
+      treatmentAIRegenerateDto,
+      withAuditLog({
+        actionType: AuditLogAction.UPDATE,
+        entityType: AuditLogEntity.APPOINTMENT,
+        getEntityUuid: ({ params }: any) => params.uuid,
+        getDescription: () => "AI raporu yeniden oluşturuldu",
+      })
+    )
+  )
+  .get(
+    "/ai/health",
+    async () => {
+      const health = await AIReportService.checkAIHealth();
+      return health;
+    },
+    treatmentAIHealthDto
+  )
+  .get(
+    "/ai/stats",
+    async () => {
+      const TreatmentServiceAI = (await import("./services")).TreatmentService;
+      const stats = await TreatmentServiceAI.getAIStats();
+      return stats;
+    },
+    treatmentAIStatsDto
   );
 
 export default app;

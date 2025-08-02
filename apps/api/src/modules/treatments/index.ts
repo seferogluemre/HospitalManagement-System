@@ -1,4 +1,6 @@
-export { default as announcementController } from './controller';
+export * from './ai';
+export * from "./ai/services";
+export { default as treatmentController } from './controller';
 export * from './dtos';
 export * from './formatters';
 export * from './service';
