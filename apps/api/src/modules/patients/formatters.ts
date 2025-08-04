@@ -22,6 +22,12 @@ export abstract class PatientFormatter {
         ? {
             id: patient.familyDoctor.id,
             specialty: patient.familyDoctor.specialty,
+            user: patient.familyDoctor.user
+              ? {
+                  firstName: patient.familyDoctor.user.firstName,
+                  lastName: patient.familyDoctor.user.lastName,
+                }
+              : undefined,
           }
         : null,
     };

@@ -160,7 +160,7 @@ export abstract class TreatmentService {
 
   static async store(payload: TreatmentCreatePayload): Promise<Treatment> {
     try {
-      // Validate appointment exists
+      
       const appointment = await prisma.appointment.findFirst({
         where: {
           uuid: payload.appointmentId,
@@ -172,7 +172,6 @@ export abstract class TreatmentService {
         throw new NotFoundException("Appointment bulunamadı");
       }
 
-      // Validate doctor exists
       const doctor = await prisma.doctor.findFirst({
         where: {
           id: payload.doctorId,
@@ -184,7 +183,6 @@ export abstract class TreatmentService {
         throw new NotFoundException("Doktor bulunamadı");
       }
 
-      // Check appointment-doctor match
       if (appointment.doctorId !== payload.doctorId) {
         throw new Error("Bu appointment bu doktora ait değil");
       }

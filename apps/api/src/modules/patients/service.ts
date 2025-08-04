@@ -45,6 +45,12 @@ export abstract class PatientService {
                         select: {
                             id: true,
                             specialty: true,
+                            user: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true,
+                                }
+                            }
                         },
                     },
                 },
@@ -81,6 +87,12 @@ export abstract class PatientService {
                         select: {
                             id: true,
                             specialty: true,
+                            user: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true,
+                                }
+                            }
                         },
                     },
                 },
@@ -161,6 +173,12 @@ export abstract class PatientService {
                         select: {
                             id: true,
                             specialty: true,
+                            user: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true,
+                                }
+                            }
                         },
                     },
                 },
@@ -214,6 +232,12 @@ export abstract class PatientService {
                         select: {
                             id: true,
                             specialty: true,
+                            user: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true,
+                                }
+                            }
                         },
                     },
                 },

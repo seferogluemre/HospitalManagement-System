@@ -34,14 +34,7 @@ export class AIReportService {
 
       const context = this.buildPromptContext(data);
 
-      console.log("AI Rapor Talebi:", JSON.stringify(context, null, 2));
       const aiResult = await AIOrchestratorService.generateTreatmentReport(context);
-      console.log("AI Rapor Sonucu:", JSON.stringify({
-        success: aiResult.success,
-        hasData: !!aiResult.data,
-        error: aiResult.error || null,
-        metadata: aiResult.metadata || null
-      }, null, 2));
 
       if (!aiResult.success || !aiResult.data) {
         return {

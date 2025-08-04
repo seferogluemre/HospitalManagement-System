@@ -18,9 +18,7 @@ export class ResponseParserService {
     validation?: ITreatmentValidationResult;
   } {
     try {
-      console.log("Raw AI Response to parse:", rawResponse);
       const parsed = this.extractJSON(rawResponse);
-      console.log("Extracted JSON:", parsed);
       
       if (!parsed) {
         return {
@@ -38,15 +36,11 @@ export class ResponseParserService {
         };
       }
 
-      console.log("Final parsed AI response:", parsed);
-      console.log("Validation result:", validation);
-      
       return {
         success: true,
         data: parsed as ITreatmentAIResponse,
         validation
       };
-
     } catch (error) {
       return {
         success: false,

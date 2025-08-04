@@ -2,7 +2,6 @@ import type { ITreatmentPromptContext } from '../types';
 import { TreatmentPromptTemplate } from './treatment-prompt.template';
 
 export class PromptBuilderService {
-
     static buildTreatmentPrompt(context: ITreatmentPromptContext): string {
         if (TreatmentPromptTemplate.checkEmergencyKeywords(context.complaint.primary)) {
             return this.buildEmergencyPrompt(context);

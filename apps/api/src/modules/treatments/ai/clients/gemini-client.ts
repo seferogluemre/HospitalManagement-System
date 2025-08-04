@@ -15,14 +15,8 @@ export class GeminiClient extends BaseAIClient {
     maxRetries: number;
     model: string;
   }) {
-    console.log("GeminiClient config received:", {
-      apiKey: config.apiKey ? "***" + config.apiKey.slice(-4) : "undefined",
-      apiUrl: config.apiUrl,
-      model: config.model
-    });
     super(config);
   }
-
 
   async generateContent(request: IAIRequest): Promise<IAIResponse> {
     return this.withRetry(async () => {
@@ -74,12 +68,6 @@ export class GeminiClient extends BaseAIClient {
   private async callGeminiAPI(request: IGeminiRequest): Promise<IGeminiResponse> {
     const url = `${this.config.apiUrl}?key=${this.config.apiKey}`;
     
-    console.log("Gemini API Request:", {
-      url: this.config.apiUrl + "?key=***",
-      method: 'POST',
-      requestBody: JSON.stringify(request, null, 2)
-    });
-
     const response = await this.makeRequest(url, {
       method: 'POST',
       body: JSON.stringify(request)
@@ -87,16 +75,8 @@ export class GeminiClient extends BaseAIClient {
 
     const data = await response.json();
 
-    console.log("Gemini API Yanıtı:", JSON.stringify(data, null, 2))
-    console.log("Response Status:", response.status, "OK:", response.ok)
-
     if (!response.ok) {
       const errorData = data as IGeminiErrorResponse;
-      console.error("Gemini API Error Details:", {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorData.error
-      });
       throw new Error(`Gemini API Error (${response.status}): ${errorData.error?.message || 'Unknown error'}`);
     }
 
@@ -105,16 +85,6 @@ export class GeminiClient extends BaseAIClient {
 
   private parseGeminiResponse(geminiResponse: IGeminiResponse): IAIResponse {
     try {
-      const candidate = geminiResponse.candidates?.[0];
-      
-      console.log("Gemini Yanıt İşleme:", JSON.stringify({
-        candidates: geminiResponse.candidates?.length || 0,
-        hasContent: !!geminiResponse.candidates?.[0]?.content,
-        textLength: geminiResponse.candidates?.[0]?.content?.parts?.[0]?.text?.length || 0
-      }, null, 2))
-      if (!candidate) {
-        throw new Error('No candidates in Gemini response');
-      }
       const text = candidate.content?.parts?.[0]?.text;
       if (!text) {
         throw new Error('No text content in Gemini response');

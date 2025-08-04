@@ -1,6 +1,5 @@
 import { errorResponseDto } from "#utils/common-dtos.ts";
 import type { ControllerHook } from "#utils/elysia-types.ts";
-import { DoctorPlain } from "@onlyjs/db/prismabox/Doctor";
 import { UserPlain } from "@onlyjs/db/prismabox/User";
 import { t } from "elysia";
 import { AppointmentPlain } from "../../../../../packages/database/prismabox/Appointment";
@@ -11,7 +10,14 @@ export const patientResponseSchema = t.Composite([
     t.Object({
         user: t.Pick(UserPlain, ["id", "firstName", "lastName", "email", "tcNo", "gender"]),
         familyDoctor: t.Nullable(
-            t.Pick(DoctorPlain, ['id', 'specialty'])
+            t.Object({
+                id: t.Number(),
+                specialty: t.String(),
+                user: t.Optional(t.Object({
+                    firstName: t.Optional(t.String()),
+                    lastName: t.Optional(t.String())
+                }))
+            })
         ),
     })
 

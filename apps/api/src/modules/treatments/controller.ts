@@ -193,7 +193,7 @@ const app = new Elysia({
     "/ai/stats",
     async () => {
       const { AIReportService } = await import("./ai/services/ai-report.service");
-     
+      
       const stats = {
         totalTreatments: 0,
         aiGeneratedCount: 0,

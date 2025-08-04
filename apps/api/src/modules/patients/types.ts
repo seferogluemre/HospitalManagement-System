@@ -39,7 +39,9 @@ export type PatientWithRelations = Patient & {
     User,
     "id" | "firstName" | "lastName" | "email" | "tcNo" | "gender"
   >;
-  familyDoctor?: Pick<Doctor, "id" | "specialty"> | null;
+  familyDoctor?: (Pick<Doctor, "id" | "specialty"> & {
+    user?: Pick<User, "firstName" | "lastName">;
+  }) | null;
 };
 
 export type PatientWithAppointments = PatientWithRelations & {

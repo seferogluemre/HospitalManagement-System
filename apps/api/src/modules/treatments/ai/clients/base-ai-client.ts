@@ -1,4 +1,4 @@
-import { type IAIRequest, type IAIResponse, type IAIClient, type IAIServiceStatus, type IAIError, AIErrorType } from '../types';
+import { type IAIClient, type IAIError, type IAIRequest, type IAIResponse, type IAIServiceStatus, AIErrorType } from '../types';
 
 export abstract class BaseAIClient implements IAIClient {
   protected config: {
