@@ -117,6 +117,7 @@ export const userCreateDto = {
     rolesSlugs: t.Array(t.String()),
     isActive: t.Optional(t.Boolean()),
     gender: t.Enum(Gender),
+    tcNo: t.Optional(t.String({ minLength: 11, maxLength: 11 })),
     imageFile: t.Optional(__nullable__(t.File())),
   }),
   response: {

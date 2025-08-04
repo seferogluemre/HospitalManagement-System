@@ -76,6 +76,7 @@ export const patientCreateDto = {
         email: UserPlain.properties.email,
         tcNo: UserPlain.properties.tcNo,
         gender: UserPlain.properties.gender,
+        password: t.String({ minLength: 8, maxLength: 32 }),
 
         // Patient fields
         phoneNumber: t.Optional(PatientPlain.properties.phoneNumber),

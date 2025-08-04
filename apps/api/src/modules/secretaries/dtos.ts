@@ -77,12 +77,12 @@ export const secretaryCreateDto = {
         email: UserPlain.properties.email,
         tcNo: UserPlain.properties.tcNo,
         gender: UserPlain.properties.gender,
+        password: t.String({ minLength: 8, maxLength: 32 }),
 
-        // Patient fields
+        // Secretary fields
         phoneNumber: t.Optional(SecretaryPlain.properties.phoneNumber),
         address: t.Optional(SecretaryPlain.properties.address),
         dateOfBirth: t.Optional(SecretaryPlain.properties.dateOfBirth),
-        familyDoctorId: t.Optional(t.Integer({ minimum: 1 })),
     }),
     response: {
         200: secretariesResponseSchema,

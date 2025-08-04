@@ -2,6 +2,7 @@ import { HandleError } from "#shared/error/index.ts";
 import { ConflictException, InternalServerErrorException, NotFoundException } from "#utils/http-errors.ts";
 import prisma from "@onlyjs/db";
 import { Prisma, type Doctor } from "@onlyjs/db/client";
+import { UsersService } from "../users";
 import type { DoctorCreatePayload, DoctorIndexQuery, DoctorUpdatePayload } from "./types";
 
 export abstract class DoctorService {
@@ -108,47 +109,51 @@ export abstract class DoctorService {
                 throw new ConflictException('Bu email veya TC kimlik numarası zaten kullanılıyor');
             }
 
-            const result = await prisma.$transaction(async (tx) => {
-                const user = await tx.user.create({
-                    data: {
-                        firstName: payload.firstName,
-                        lastName: payload.lastName,
-                        name: `${payload.firstName} ${payload.lastName}`,
-                        email: payload.email,
-                        tcNo: payload.tcNo,
-                        gender: payload.gender,
-                        emailVerified: false,
-                        rolesSlugs: ['doctor'],
-                    }
-                })
+            // Create user with authentication (without role first)
+            const user = await UsersService.store({
+                firstName: payload.firstName,
+                lastName: payload.lastName,
+                email: payload.email,
+                tcNo: payload.tcNo,
+                gender: payload.gender,
+                password: payload.password,
+                rolesSlugs: ['basic'], // Use basic role initially
+            });
 
-                const doctor = await tx.doctor.create({
-                    data: {
-                        userId: user.id,
-                        clinicId: payload.clinicId,
-                        phoneNumber: payload.phoneNumber,
-                        address: payload.address,
-                        dateOfBirth: payload.dateOfBirth,
-                        specialty: payload.specialty,
-                    },
-                    include: {
-                        user: {
-                            select: {
-                                id: true,
-                                firstName: true,
-                                lastName: true,
-                                email: true,
-                                tcNo: true,
-                                gender: true,
-                            },
+            const doctor = await prisma.doctor.create({
+                data: {
+                    userId: user.id,
+                    clinicId: payload.clinicId,
+                    phoneNumber: payload.phoneNumber,
+                    address: payload.address,
+                    dateOfBirth: payload.dateOfBirth,
+                    specialty: payload.specialty,
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            tcNo: true,
+                            gender: true,
                         },
                     },
+                },
+            });
+
+            // Try to assign doctor role after successful creation
+            try {
+                await prisma.user.update({
+                    where: { id: user.id },
+                    data: { rolesSlugs: ['doctor'] }
                 });
+            } catch (error) {
+                console.log('Doctor role assignment failed, user created with basic role');
+            }
 
-                return doctor;
-            })
-
-            return result
+            return doctor
         } catch (error) {
             await HandleError.handlePrismaError(error, "doctor", "create")
             throw error

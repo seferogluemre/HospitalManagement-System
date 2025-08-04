@@ -7,8 +7,9 @@ export interface SecretaryCreatePayload {
   email: string;
   tcNo: string;
   gender: Gender;
+  password: string;
 
-  // Patient specific fields
+  // Secretary specific fields
   phoneNumber?: string;
   address?: string;
   dateOfBirth?: Date;

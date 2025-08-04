@@ -7,6 +7,7 @@ export interface PatientCreatePayload {
   email: string;
   tcNo: string;
   gender: Gender;
+  password: string;
 
   // Patient specific fields
   phoneNumber?: string;

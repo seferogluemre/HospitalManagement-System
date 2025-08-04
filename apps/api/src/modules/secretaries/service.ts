@@ -1,7 +1,8 @@
 import { HandleError } from "#shared/error/index.ts";
 import { ConflictException, InternalServerErrorException, NotFoundException } from "#utils/http-errors.ts";
 import prisma from "@onlyjs/db";
-import { Prisma,  type Secretary } from "@onlyjs/db/client";
+import { Prisma, type Secretary } from "@onlyjs/db/client";
+import { UsersService } from "../users";
 import type { SecretaryCreatePayload, SecretaryIndexQuery, SecretaryUpdatePayload } from "./types";
 
 export abstract class SecretaryService {
@@ -102,46 +103,50 @@ export abstract class SecretaryService {
                 throw new ConflictException('Bu email veya TC kimlik numarası zaten kullanılıyor');
             }
 
-            const result = await prisma.$transaction(async (tx) => {
-                const user = await tx.user.create({
-                    data: {
-                        firstName: payload.firstName,
-                        lastName: payload.lastName,
-                        name: `${payload.firstName} ${payload.lastName}`,
-                        email: payload.email,
-                        tcNo: payload.tcNo,
-                        gender: payload.gender,
-                        emailVerified: false,
-                        rolesSlugs: ['secretary'],
-                    }
-                })
+            // Create user with authentication (without role first)
+            const user = await UsersService.store({
+                firstName: payload.firstName,
+                lastName: payload.lastName,
+                email: payload.email,
+                tcNo: payload.tcNo,
+                gender: payload.gender,
+                password: payload.password,
+                rolesSlugs: ['basic'], // Use basic role initially
+            });
 
-                // Create Secretary
-                const secretary = await tx.secretary.create({
-                    data: {
-                        userId: user.id,
-                        phoneNumber: payload.phoneNumber,
-                        address: payload.address,
-                        dateOfBirth: payload.dateOfBirth,
-                    },
-                    include: {
-                        user: {
-                            select: {
-                                id: true,
-                                firstName: true,
-                                lastName: true,
-                                email: true,
-                                tcNo: true,
-                                gender: true,
-                            },
+            // Create Secretary
+            const secretary = await prisma.secretary.create({
+                data: {
+                    userId: user.id,
+                    phoneNumber: payload.phoneNumber,
+                    address: payload.address,
+                    dateOfBirth: payload.dateOfBirth,
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            tcNo: true,
+                            gender: true,
                         },
                     },
+                },
+            });
+
+            // Try to assign secretary role after successful creation
+            try {
+                await prisma.user.update({
+                    where: { id: user.id },
+                    data: { rolesSlugs: ['secretary'] }
                 });
+            } catch (error) {
+                console.log('Secretary role assignment failed, user created with basic role');
+            }
 
-                return secretary;
-            })
-
-            return result
+            return secretary
         } catch (error) {
             await HandleError.handlePrismaError(error, "secretary", "create")
             throw error

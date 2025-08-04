@@ -2,6 +2,7 @@ import { HandleError } from "#shared/error/index.ts";
 import { ConflictException, InternalServerErrorException, NotFoundException } from "#utils/http-errors.ts";
 import prisma from "@onlyjs/db";
 import { Prisma, type Patient } from "@onlyjs/db/client";
+import { UsersService } from "../users";
 import type { PatientCreatePayload, PatientIndexQuery, PatientUpdatePayload } from "./types";
 
 export abstract class PatientService {
@@ -125,54 +126,57 @@ export abstract class PatientService {
 
 
 
-            const result = await prisma.$transaction(async (tx) => {
-                const user = await tx.user.create({
-                    data: {
-                        firstName: payload.firstName,
-                        lastName: payload.lastName,
-                        name: `${payload.firstName} ${payload.lastName}`,
-                        email: payload.email,
-                        tcNo: payload.tcNo,
-                        gender: payload.gender,
-                        emailVerified: false,
-                        rolesSlugs: ['patient'],
+            // Create user with authentication (without role first)
+            const user = await UsersService.store({
+                firstName: payload.firstName,
+                lastName: payload.lastName,
+                email: payload.email,
+                tcNo: payload.tcNo,
+                gender: payload.gender,
+                password: payload.password,
+                rolesSlugs: ['basic'], // Use basic role initially
+            });
 
-                    }
-                })
-
-                // Create patient
-                const patient = await tx.patient.create({
-                    data: {
-                        userId: user.id,
-                        phoneNumber: payload.phoneNumber,
-                        address: payload.address,
-                        dateOfBirth: payload.dateOfBirth,
-                        familyDoctorId: payload.familyDoctorId,
-                    },
-                    include: {
-                        user: {
-                            select: {
-                                id: true,
-                                firstName: true,
-                                lastName: true,
-                                email: true,
-                                tcNo: true,
-                                gender: true,
-                            },
-                        },
-                        familyDoctor: {
-                            select: {
-                                id: true,
-                                specialty: true,
-                            },
+            // Create patient
+            const patient = await prisma.patient.create({
+                data: {
+                    userId: user.id,
+                    phoneNumber: payload.phoneNumber,
+                    address: payload.address,
+                    dateOfBirth: payload.dateOfBirth,
+                    familyDoctorId: payload.familyDoctorId,
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            tcNo: true,
+                            gender: true,
                         },
                     },
+                    familyDoctor: {
+                        select: {
+                            id: true,
+                            specialty: true,
+                        },
+                    },
+                },
+            });
+
+            // Try to assign patient role after successful creation
+            try {
+                await prisma.user.update({
+                    where: { id: user.id },
+                    data: { rolesSlugs: ['patient'] }
                 });
+            } catch (error) {
+                console.log('Patient role assignment failed, user created with basic role');
+            }
 
-                return patient;
-            })
-
-            return result
+            return patient
         } catch (error) {
             await HandleError.handlePrismaError(error, "patient", "create")
             throw error

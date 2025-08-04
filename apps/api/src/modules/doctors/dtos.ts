@@ -55,6 +55,7 @@ export const doctorCreateDto = {
     email: UserPlain.properties.email,
     tcNo: UserPlain.properties.tcNo,
     gender: UserPlain.properties.gender,
+    password: t.String({ minLength: 8, maxLength: 32 }),
 
     clinicId: t.Number({ minimum: 1 }),
     phoneNumber: t.Optional(t.String()),
