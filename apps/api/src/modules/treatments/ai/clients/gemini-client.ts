@@ -1,9 +1,9 @@
-import type { 
-  IAIRequest, 
+import type {
+  IAIRequest,
   IAIResponse,
+  IGeminiErrorResponse,
   IGeminiRequest,
-  IGeminiResponse,
-  IGeminiErrorResponse
+  IGeminiResponse
 } from '../types';
 import { BaseAIClient } from './base-ai-client';
 
@@ -19,7 +19,7 @@ export class GeminiClient extends BaseAIClient {
     super(config);
   }
 
- 
+
   async generateContent(request: IAIRequest): Promise<IAIResponse> {
     return this.withRetry(async () => {
       const geminiRequest = this.buildGeminiRequest(request);
@@ -51,7 +51,7 @@ export class GeminiClient extends BaseAIClient {
           threshold: "BLOCK_MEDIUM_AND_ABOVE"
         },
         {
-          category: "HARM_CATEGORY_HATE_SPEECH", 
+          category: "HARM_CATEGORY_HATE_SPEECH",
           threshold: "BLOCK_MEDIUM_AND_ABOVE"
         },
         {
@@ -66,16 +66,18 @@ export class GeminiClient extends BaseAIClient {
     };
   }
 
- 
+
   private async callGeminiAPI(request: IGeminiRequest): Promise<IGeminiResponse> {
     const url = `${this.config.apiUrl}?key=${this.config.apiKey}`;
-    
+
     const response = await this.makeRequest(url, {
       method: 'POST',
       body: JSON.stringify(request)
     });
 
     const data = await response.json();
+
+    console.log("Gemini API Yanıtı:", JSON.stringify(data, null, 2))
 
     if (!response.ok) {
       const errorData = data as IGeminiErrorResponse;
@@ -88,10 +90,15 @@ export class GeminiClient extends BaseAIClient {
   private parseGeminiResponse(geminiResponse: IGeminiResponse): IAIResponse {
     try {
       const candidate = geminiResponse.candidates?.[0];
+      
+      console.log("Gemini Yanıt İşleme:", JSON.stringify({
+        candidates: geminiResponse.candidates?.length || 0,
+        hasContent: !!geminiResponse.candidates?.[0]?.content,
+        textLength: geminiResponse.candidates?.[0]?.content?.parts?.[0]?.text?.length || 0
+      }, null, 2))
       if (!candidate) {
         throw new Error('No candidates in Gemini response');
       }
-
       const text = candidate.content?.parts?.[0]?.text;
       if (!text) {
         throw new Error('No text content in Gemini response');
@@ -101,13 +108,15 @@ export class GeminiClient extends BaseAIClient {
         success: true,
         data: text,
         metadata: {
-          model: geminiResponse.modelVersion || this.config.model,
-          usage: {
-            promptTokens: geminiResponse.usageMetadata.promptTokenCount,
-            completionTokens: geminiResponse.usageMetadata.candidatesTokenCount,
-            totalTokens: geminiResponse.usageMetadata.totalTokenCount
-          },
-          processingTime: 0, // Hesaplanacak
+          model: this.config.model,
+          usage: geminiResponse.usageMetadata
+            ? {
+                promptTokens: geminiResponse.usageMetadata.promptTokenCount,
+                completionTokens: geminiResponse.usageMetadata.candidatesTokenCount,
+                totalTokens: geminiResponse.usageMetadata.totalTokenCount
+              }
+            : undefined,
+          processingTime: 0, 
           requestId: geminiResponse.responseId
         }
       };

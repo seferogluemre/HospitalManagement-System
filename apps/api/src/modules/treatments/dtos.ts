@@ -9,22 +9,22 @@ export const treatmentResponseSchema = t.Composite([
     "doctorId",
     "deletedAt",
   ]),
-  t.Object({
+  t.Partial(t.Object({
     id: t.Number(),
-    doctor: t.Object({
+    doctor: t.Optional(t.Object({
       id: t.Number(),
       uuid: t.String(),
-      specialty: t.String(),
+      specialty: t.Optional(t.String()),
       user: t.Object({
         firstName: t.String(),
         lastName: t.String(),
         email: t.String(),
       }),
-      clinic: t.Optional(t.Object({
+      clinic: t.Optional(t.Nullable(t.Object({
         uuid: t.String(),
         name: t.String(),
-      })),
-    }),
+      }))),
+    })),
     appointment: t.Object({
       uuid: t.String(),
       appointmentDate: t.Date(),
@@ -36,7 +36,7 @@ export const treatmentResponseSchema = t.Composite([
         }),
       }),
     }),
-  }),
+  })),
 ]);
 
 export const treatmentsIndexDto = {

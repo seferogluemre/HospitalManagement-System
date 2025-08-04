@@ -29,10 +29,29 @@ export abstract class TreatmentService {
         notes: payload.doctorNotes,
         diagnosis: aiReport.aiResponse?.diagnosis || "",
         appointmentId: payload.appointmentId,
-        doctorId: payload.doctorId
+        doctorId: payload.doctorId,
+        patientComplaint: payload.patientComplaint,
+        aiTreatment: aiReport.aiResponse?.treatment || "",
+        aiRecommendations: aiReport.aiResponse?.recommendations || "",
+        aiFollowUp: aiReport.aiResponse?.followUp || "",
+        aiStatus: aiReport.aiStatus
       };
 
       const treatment = await BaseTreatmentService.store(treatmentData);
+
+      console.log("Treatment AI Sonuç:", JSON.stringify({
+        treatmentId: treatment.id,
+        treatmentUuid: treatment.uuid,
+        aiGenerated: aiReport.success,
+        aiConfidence: aiReport.confidence,
+        aiStatus: aiReport.aiStatus,
+        aiResponseFields: {
+          diagnosis: !!aiReport.aiResponse?.diagnosis,
+          treatment: !!aiReport.aiResponse?.treatment,
+          recommendations: !!aiReport.aiResponse?.recommendations,
+          followUp: !!aiReport.aiResponse?.followUp
+        }
+      }, null, 2));
 
       return {
         treatment,
@@ -63,7 +82,12 @@ export abstract class TreatmentService {
       });
 
       const updateData: TreatmentUpdatePayload = {
-        diagnosis: aiReport.aiResponse?.diagnosis || ""
+        diagnosis: aiReport.aiResponse?.diagnosis || "",
+        patientComplaint: existingTreatment.patientComplaint,
+        aiTreatment: aiReport.aiResponse?.treatment || "",
+        aiRecommendations: aiReport.aiResponse?.recommendations || "",
+        aiFollowUp: aiReport.aiResponse?.followUp || "",
+        aiStatus: aiReport.aiStatus
       };
 
       const updatedTreatment = await BaseTreatmentService.update(uuid, updateData);

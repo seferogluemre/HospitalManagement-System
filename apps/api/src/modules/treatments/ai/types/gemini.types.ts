@@ -27,6 +27,7 @@ export interface IGeminiSafetySetting {
 }
 
 export interface IGeminiResponse {
+    responseId: string;
     candidates: IGeminiCandidate[];
     usageMetadata?: IGeminiUsageMetadata;
 }
