@@ -1,5 +1,4 @@
 export const AI_CONSTANTS = {
-    // Prompt Templates
     PROMPTS: {
         TREATMENT_SYSTEM_ROLE: `Sen deneyimli bir doktorsun. Hastanın şikayetlerine göre profesyonel bir tedavi raporu hazırlayacaksın.`,
 
