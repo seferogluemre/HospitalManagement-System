@@ -1,6 +1,15 @@
 import { AI_CONSTANTS } from "#modules/treatments/constants/constants.ts";
 import type { ITreatmentAIResponse } from "../types";
 
+interface ITreatmentValidationResult {
+  isValid: boolean;
+  quality: 'high' | 'medium' | 'low';
+  issues: string[];
+  confidence: number;
+  requiredFields: readonly string[];
+  missingFields: string[];
+}
+
 export class ResponseParserService {
   static parseAIResponse(rawResponse: string): {
     success: boolean;
@@ -9,7 +18,10 @@ export class ResponseParserService {
     validation?: ITreatmentValidationResult;
   } {
     try {
+      console.log("Raw AI Response to parse:", rawResponse);
       const parsed = this.extractJSON(rawResponse);
+      console.log("Extracted JSON:", parsed);
+      
       if (!parsed) {
         return {
           success: false,
@@ -26,6 +38,9 @@ export class ResponseParserService {
         };
       }
 
+      console.log("Final parsed AI response:", parsed);
+      console.log("Validation result:", validation);
+      
       return {
         success: true,
         data: parsed as ITreatmentAIResponse,

@@ -8,7 +8,6 @@ import type {
 import { BaseAIClient } from './base-ai-client';
 
 export class GeminiClient extends BaseAIClient {
-  override config: any;
   constructor(config: {
     apiKey: string;
     apiUrl: string;
@@ -16,6 +15,11 @@ export class GeminiClient extends BaseAIClient {
     maxRetries: number;
     model: string;
   }) {
+    console.log("GeminiClient config received:", {
+      apiKey: config.apiKey ? "***" + config.apiKey.slice(-4) : "undefined",
+      apiUrl: config.apiUrl,
+      model: config.model
+    });
     super(config);
   }
 
@@ -69,6 +73,12 @@ export class GeminiClient extends BaseAIClient {
 
   private async callGeminiAPI(request: IGeminiRequest): Promise<IGeminiResponse> {
     const url = `${this.config.apiUrl}?key=${this.config.apiKey}`;
+    
+    console.log("Gemini API Request:", {
+      url: this.config.apiUrl + "?key=***",
+      method: 'POST',
+      requestBody: JSON.stringify(request, null, 2)
+    });
 
     const response = await this.makeRequest(url, {
       method: 'POST',
@@ -78,10 +88,16 @@ export class GeminiClient extends BaseAIClient {
     const data = await response.json();
 
     console.log("Gemini API Yanıtı:", JSON.stringify(data, null, 2))
+    console.log("Response Status:", response.status, "OK:", response.ok)
 
     if (!response.ok) {
       const errorData = data as IGeminiErrorResponse;
-      throw new Error(`Gemini API Error: ${errorData.error.message}`);
+      console.error("Gemini API Error Details:", {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData.error
+      });
+      throw new Error(`Gemini API Error (${response.status}): ${errorData.error?.message || 'Unknown error'}`);
     }
 
     return data as IGeminiResponse;

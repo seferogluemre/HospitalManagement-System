@@ -1,29 +1,37 @@
 export const AIConfig = {
     GEMINI: {
-        API_KEY: process.env.GEMINI_API_KEY!,
-        API_URL: process.env.GEMINI_API_URL || 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
-        TIMEOUT: parseInt(process.env.GEMINI_TIMEOUT || '30000'),
-        MAX_RETRIES: parseInt(process.env.GEMINI_MAX_RETRIES || '3'),
-        MODEL: 'gemini-1.5-flash',
+        apiKey: process.env.GEMINI_API_KEY!,
+        apiUrl: process.env.GEMINI_API_URL || 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
+        timeout: parseInt(process.env.GEMINI_TIMEOUT || '30000'),
+        maxRetries: parseInt(process.env.GEMINI_MAX_RETRIES || '3'),
+        model: 'gemini-1.5-flash',
     }
 } as const;
 
 export function validateAIConfig(): void {
-    if (!AIConfig.GEMINI.API_KEY) {
+    // Çevre değişkenlerini kontrol et
+    console.log("ENV Variables Check:", {
+        GEMINI_API_KEY_EXISTS: !!process.env.GEMINI_API_KEY,
+        GEMINI_API_URL_EXISTS: !!process.env.GEMINI_API_URL
+    });
+
+    if (!AIConfig.GEMINI.apiKey) {
+        console.error("GEMINI_API_KEY missing in AIConfig");
         throw new Error('GEMINI_API_KEY is required in environment variables');
     }
 
-    if (!AIConfig.GEMINI.API_URL) {
+    if (!AIConfig.GEMINI.apiUrl) {
+        console.error("GEMINI_API_URL missing in AIConfig");
         throw new Error('GEMINI_API_URL is required in environment variables');
     }
 }
 
 export interface IAIConfig {
     readonly GEMINI: {
-        readonly API_KEY: string;
-        readonly API_URL: string;
-        readonly TIMEOUT: number;
-        readonly MAX_RETRIES: number;
-        readonly MODEL: string;
+        readonly apiKey: string;
+        readonly apiUrl: string;
+        readonly timeout: number;
+        readonly maxRetries: number;
+        readonly model: string;
     };
 }

@@ -1,5 +1,5 @@
-import { TreatmentPromptTemplate } from './treatment-prompt.template';
 import type { ITreatmentPromptContext } from '../types';
+import { TreatmentPromptTemplate } from './treatment-prompt.template';
 
 export class PromptBuilderService {
 

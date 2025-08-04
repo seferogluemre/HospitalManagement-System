@@ -196,6 +196,13 @@ export abstract class TreatmentService {
           diagnosis: payload.diagnosis,
           appointmentId: payload.appointmentId,
           doctorId: payload.doctorId,
+          // AI Fields
+          patientComplaint: payload.patientComplaint,
+          aiTreatment: payload.aiTreatment,
+          aiRecommendations: payload.aiRecommendations,
+          aiFollowUp: payload.aiFollowUp,
+          aiStatus: payload.aiStatus,
+          aiReviewNotes: payload.aiReviewNotes,
         },
         include: {
           doctor: {

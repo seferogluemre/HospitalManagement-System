@@ -39,6 +39,8 @@ export abstract class TreatmentService {
 
       const treatment = await BaseTreatmentService.store(treatmentData);
 
+      console.log("AI Response Raw Data:", JSON.stringify(aiReport.aiResponse, null, 2));
+      console.log("Treatment Data Before Store:", JSON.stringify(treatmentData, null, 2));
       console.log("Treatment AI Sonuç:", JSON.stringify({
         treatmentId: treatment.id,
         treatmentUuid: treatment.uuid,

@@ -1,11 +1,11 @@
+import { AIConfig, validateAIConfig } from '../../config';
 import { GeminiClient } from '../clients';
 import { PromptBuilderService } from '../prompts';
-import { ResponseParserService } from './response-parser.service';
-import { AIConfig, validateAIConfig } from '../../config';
-import type { 
-  ITreatmentPromptContext, 
-  ITreatmentAIResponse, 
+import type {
+  ITreatmentAIResponse,
+  ITreatmentPromptContext,
 } from '../types';
+import { ResponseParserService } from './response-parser.service';
 
 export class AIOrchestratorService {
   private static geminiClient: GeminiClient | null = null;
@@ -15,8 +15,14 @@ export class AIOrchestratorService {
     if (!this.geminiClient) {
       try {
         validateAIConfig();
+        console.log("AI Config:", {
+          apiKey: AIConfig.GEMINI.apiKey ? "***" + AIConfig.GEMINI.apiKey.slice(-4) : "undefined",
+          apiUrl: AIConfig.GEMINI.apiUrl,
+          model: AIConfig.GEMINI.model
+        });
         this.geminiClient = new GeminiClient(AIConfig.GEMINI);
       } catch (error) {
+        console.error("AI Client initialization error:", error);
         throw new Error(`AI Client initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
@@ -41,8 +47,11 @@ export class AIOrchestratorService {
     
     try {
       const prompt = PromptBuilderService.buildTreatmentPrompt(context);
+      console.log("Generated Prompt:", prompt);
       
       const promptValidation = PromptBuilderService.validatePromptLength(prompt);
+      console.log("Prompt Validation:", promptValidation);
+      
       if (!promptValidation.isValid) {
         return {
           success: false,
@@ -149,7 +158,7 @@ export class AIOrchestratorService {
     
     for (let i = 0; i < contexts.length; i++) {
       try {
-        const result = await this.generateTreatmentReport(contexts[i]);
+        const result = await this.generateTreatmentReport(contexts[i]!);
         results.push({
           index: i,
           ...result
