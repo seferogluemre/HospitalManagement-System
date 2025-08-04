@@ -9,7 +9,7 @@ import { AuthenticationService } from './service';
 
 export const betterAuth = betterAuthBase({
   database: prismaAdapter(prisma, {
-    provider: 'postgresql', // or "mysql", "postgresql", ...etc
+    provider: 'postgresql', 
   }),
   //
   appName: process.env.APP_NAME,

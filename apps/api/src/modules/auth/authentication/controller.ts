@@ -53,7 +53,7 @@ const app = new Elysia({
           response.headers.set('Content-Type', 'application/json');
         }
       }
-
+      
       return response;
     } else {
       context.error(405);
