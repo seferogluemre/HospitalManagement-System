@@ -13,12 +13,19 @@ export const prescriptionResponseSchema = t.Composite([
         updatedAt: t.String(),
     }),
     t.Object({
-        appointment: t.Pick(AppointmentPlain, [
-            "id",
-            "appointmentDate",
-            "status",
-            "notes",
-        ]),
+        appointment: t.Object({
+            id: t.Number(),
+            uuid: t.String(),
+            appointmentDate: t.String(),
+            status: t.Union([
+                t.Literal("SCHEDULED"),
+                t.Literal("CONFIRMED"),
+                t.Literal("COMPLETED"),
+                t.Literal("NO_SHOW"),
+                t.Literal("CANCELLED"),
+            ]),
+            notes: t.Nullable(t.String()),
+        }),
         doctor: t.Object({
             id: t.Number(),
             specialty: t.String(),
