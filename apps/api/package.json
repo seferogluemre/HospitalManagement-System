@@ -11,7 +11,8 @@
     "dev": "dotenvx run --quiet -f ../../config/apps/api/.env -- nodemon",
     "serve": "dotenvx run --quiet -f ../../config/apps/api/.env -- bun run dev",
     "start": "dotenvx run --quiet -f ../../config/apps/api/.env -- bun ../../dist/apps/api/index.js",
-    "prisma": "cd ../../packages/database && bun run prisma"
+    "prisma": "cd ../../packages/database && bun run prisma",
+    "seed": "bun run seeders/index.ts"
   },
   "type": "module",
   "dependencies": {
