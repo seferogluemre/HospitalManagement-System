@@ -1,4 +1,5 @@
 import { auth } from "#modules/auth/authentication/plugin.ts";
+import { PERMISSIONS, withPermission } from "#modules/auth/index.ts";
 import { BadRequestException } from "#utils/http-errors.ts";
 import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
@@ -28,6 +29,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       doctorCreateDto,
+      withPermission(PERMISSIONS.DOCTORS.CREATE),
       withAuditLog({
         actionType: AuditLogAction.CREATE,
         entityType: AuditLogEntity.USER,
@@ -48,7 +50,10 @@ const app = new Elysia({
       const response = doctors.map(DoctorFormatter.response);
       return response;
     },
-    doctorsIndexDto
+    dtoWithMiddlewares(
+      doctorsIndexDto,
+      withPermission(PERMISSIONS.DOCTORS.READ)
+    )
   )
   .get(
     "/:uuid",
@@ -60,7 +65,10 @@ const app = new Elysia({
       const response = DoctorFormatter.response(doctor);
       return response;
     },
-    doctorShowDto
+    dtoWithMiddlewares(
+      doctorShowDto,
+      withPermission(PERMISSIONS.DOCTORS.SHOW)
+    )
   )
   .patch(
     "/:uuid", // update
@@ -72,6 +80,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       doctorUpdateDto,
+      withPermission(PERMISSIONS.DOCTORS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.USER,
@@ -89,6 +98,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       doctorDestroyDto,
+      withPermission(PERMISSIONS.DOCTORS.DESTROY),
       withAuditLog({
         actionType: AuditLogAction.DELETE,
         entityType: AuditLogEntity.USER,
@@ -107,6 +117,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       doctorShowDto,
+      withPermission(PERMISSIONS.DOCTORS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.USER,

@@ -1,4 +1,5 @@
 import { auth } from "#modules/auth/authentication/plugin.ts";
+import { PERMISSIONS, withPermission } from "#modules/auth/index.ts";
 import { BadRequestException } from "#utils/http-errors.ts";
 import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
@@ -29,11 +30,14 @@ const app = new Elysia({
   .post(
     "",
     async ({ body }) => {
+      console.log("Teşhis kontrolüne girildi", body);
       const treatment = await TreatmentService.store(body);
+      console.log("Teşhis kontrolünden çıkıldı", treatment);
       return TreatmentFormatter.response(treatment);
     },
     dtoWithMiddlewares(
-      treatmentCreateDto,
+      treatmentCreateDto, 
+      withPermission(PERMISSIONS.TREATMENTS.CREATE),
       withAuditLog({
         actionType: AuditLogAction.CREATE,
         entityType: AuditLogEntity.APPOINTMENT, 
@@ -79,7 +83,10 @@ const app = new Elysia({
       const response = treatments.map((treatment: any) => TreatmentFormatter.response(treatment));
       return response;
     },
-    treatmentsIndexDto
+    dtoWithMiddlewares(
+      treatmentsIndexDto,
+      withPermission(PERMISSIONS.TREATMENTS.READ)
+    )
   )
   .get(
     "/:uuid",
@@ -91,7 +98,10 @@ const app = new Elysia({
       const response = TreatmentFormatter.response(treatment);
       return response;
     },
-    treatmentShowDto
+    dtoWithMiddlewares(
+      treatmentShowDto,
+      withPermission(PERMISSIONS.TREATMENTS.SHOW)
+    )
   )
   .patch(
     "/:uuid",
@@ -102,6 +112,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       treatmentUpdateDto,
+      withPermission(PERMISSIONS.TREATMENTS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.APPOINTMENT,
@@ -118,6 +129,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       treatmentDestroyDto,
+      withPermission(PERMISSIONS.TREATMENTS.DESTROY),
       withAuditLog({
         actionType: AuditLogAction.DELETE,
         entityType: AuditLogEntity.APPOINTMENT,
@@ -135,6 +147,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       treatmentShowDto,
+      withPermission(PERMISSIONS.TREATMENTS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.APPOINTMENT,
@@ -152,6 +165,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       treatmentAIReviewDto,
+      withPermission(PERMISSIONS.TREATMENTS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.APPOINTMENT,
@@ -173,7 +187,8 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       treatmentAIRegenerateDto,
-      withAuditLog({
+      withPermission(PERMISSIONS.TREATMENTS.UPDATE),
+        withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.APPOINTMENT,
         getEntityUuid: ({ params }: any) => params.uuid,
@@ -187,23 +202,30 @@ const app = new Elysia({
       const health = await AIReportService.checkAIHealth();
       return health;
     },
-    treatmentAIHealthDto
+    dtoWithMiddlewares(
+      treatmentAIHealthDto,
+      withPermission(PERMISSIONS.TREATMENTS.READ)
+    )
   )
   .get(
     "/ai/stats",
     async () => {
       const { AIReportService } = await import("./ai/services/ai-report.service");
-      
+
+      // You should replace these with actual values from your service
       const stats = {
-        totalTreatments: 0,
-        aiGeneratedCount: 0,
-        aiSuccessRate: 0,
-        averageConfidence: 0,
-        status: "operational"
+        totalAIReports: 0,
+        approvedReports: 0,
+        pendingReports: 0,
+        rejectedReports: 0,
+        averageConfidence: 0
       };
       return stats;
     },
-    treatmentAIStatsDto
+    dtoWithMiddlewares(
+      treatmentAIStatsDto,
+      withPermission(PERMISSIONS.TREATMENTS.READ)
+    )
   );
 
 export default app;

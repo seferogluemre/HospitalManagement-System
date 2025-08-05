@@ -31,6 +31,7 @@ export function withAuditLog<
         return;
       }
 
+
       try {
         await AuditLogService.create({
           userId: user.id,

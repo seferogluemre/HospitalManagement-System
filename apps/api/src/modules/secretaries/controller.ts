@@ -1,4 +1,5 @@
 import { auth } from "#modules/auth/authentication/plugin.ts";
+import { PERMISSIONS, withPermission } from "#modules/auth/index.ts";
 import { BadRequestException } from "#utils/http-errors.ts";
 import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
@@ -22,6 +23,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       secretaryCreateDto,
+      withPermission(PERMISSIONS.SECRETARIES.CREATE),
       withAuditLog({
         actionType: AuditLogAction.CREATE,
         entityType: AuditLogEntity.USER,
@@ -41,7 +43,10 @@ const app = new Elysia({
       const response = secretaries.map(SecretaryFormatter.response);
       return response;
     },
-    secretariesIndexDto
+    dtoWithMiddlewares(
+      secretariesIndexDto,
+      withPermission(PERMISSIONS.SECRETARIES.READ)
+    )
   )
   .get(
     "/:uuid",
@@ -53,7 +58,10 @@ const app = new Elysia({
       const response = SecretaryFormatter.response(secretary);
       return response;
     },
-    secretaryShowDto
+    dtoWithMiddlewares(
+      secretaryShowDto,
+      withPermission(PERMISSIONS.SECRETARIES.SHOW)
+    )
   )
   .patch(
     "/:uuid", // update
@@ -65,6 +73,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       secretaryUpdateDto,
+      withPermission(PERMISSIONS.SECRETARIES.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.USER,
@@ -82,6 +91,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       secretaryDestroyDto,
+      withPermission(PERMISSIONS.SECRETARIES.DESTROY),
       withAuditLog({
         actionType: AuditLogAction.DELETE,
         entityType: AuditLogEntity.USER,
@@ -100,6 +110,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       secretaryShowDto,
+      withPermission(PERMISSIONS.SECRETARIES.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.USER,

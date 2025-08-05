@@ -1,4 +1,5 @@
 import { auth } from "#modules/auth/authentication/plugin.ts";
+import { PERMISSIONS, withPermission } from "#modules/auth/index.ts";
 import { BadRequestException } from "#utils/http-errors.ts";
 import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
@@ -28,6 +29,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       medicalRecordCreateDto,
+      withPermission(PERMISSIONS.MEDICAL_RECORDS.CREATE),
       withAuditLog({
         actionType: AuditLogAction.CREATE,
         entityType: AuditLogEntity.MEDICAL_RECORD,
@@ -50,7 +52,10 @@ const app = new Elysia({
       });
       return medicalRecords.map(MedicalRecordFormatter.response);
     },
-    medicalRecordsIndexDto
+    dtoWithMiddlewares(
+      medicalRecordsIndexDto,
+      withPermission(PERMISSIONS.MEDICAL_RECORDS.READ)
+    )
   )
   .get(
     "/:uuid",
@@ -61,7 +66,10 @@ const app = new Elysia({
       const medicalRecord = await MedicalRecordService.show({ uuid });
       return MedicalRecordFormatter.response(medicalRecord);
     },
-    medicalRecordShowDto
+    dtoWithMiddlewares(
+      medicalRecordShowDto,
+      withPermission(PERMISSIONS.MEDICAL_RECORDS.SHOW)
+    )
   )
   .patch(
     "/:uuid",
@@ -71,6 +79,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       medicalRecordUpdateDto,
+      withPermission(PERMISSIONS.MEDICAL_RECORDS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.MEDICAL_RECORD,
@@ -87,6 +96,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       medicalRecordDestroyDto,
+      withPermission(PERMISSIONS.MEDICAL_RECORDS.DESTROY),
       withAuditLog({
         actionType: AuditLogAction.DELETE,
         entityType: AuditLogEntity.MEDICAL_RECORD,
@@ -103,6 +113,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       medicalRecordShowDto,
+      withPermission(PERMISSIONS.MEDICAL_RECORDS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.MEDICAL_RECORD,

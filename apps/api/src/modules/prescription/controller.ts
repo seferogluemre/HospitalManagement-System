@@ -1,4 +1,5 @@
 import { auth } from "#modules/auth/authentication/plugin.ts";
+import { PERMISSIONS, withPermission } from "#modules/auth/index.ts";
 import { BadRequestException } from "#utils/http-errors.ts";
 import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
@@ -28,6 +29,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       prescriptionCreateDto,
+      withPermission(PERMISSIONS.PRESCRIPTIONS.CREATE),
       withAuditLog({
         actionType: AuditLogAction.CREATE,
         entityType: AuditLogEntity.PRESCRIPTION,
@@ -49,7 +51,10 @@ const app = new Elysia({
       });
       return prescriptions.map(PrescriptionFormatter.response);
     },
-    prescriptionsIndexDto
+    dtoWithMiddlewares(
+      prescriptionsIndexDto,
+      withPermission(PERMISSIONS.PRESCRIPTIONS.READ)
+    )
   )
   .get(
     "/:uuid",
@@ -60,7 +65,10 @@ const app = new Elysia({
       const prescription = await PrescriptionService.show({ uuid });
       return PrescriptionFormatter.response(prescription);
     },
-    prescriptionShowDto
+    dtoWithMiddlewares(
+      prescriptionShowDto,
+      withPermission(PERMISSIONS.PRESCRIPTIONS.SHOW)
+    )
   )
   .patch(
     "/:uuid",
@@ -70,6 +78,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       prescriptionUpdateDto,
+      withPermission(PERMISSIONS.PRESCRIPTIONS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.PRESCRIPTION,
@@ -86,6 +95,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       prescriptionDestroyDto,
+      withPermission(PERMISSIONS.PRESCRIPTIONS.DESTROY),
       withAuditLog({
         actionType: AuditLogAction.DELETE,
         entityType: AuditLogEntity.PRESCRIPTION,
@@ -102,6 +112,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       prescriptionShowDto,
+      withPermission(PERMISSIONS.PRESCRIPTIONS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.PRESCRIPTION,

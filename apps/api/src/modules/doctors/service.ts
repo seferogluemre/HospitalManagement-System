@@ -109,7 +109,7 @@ export abstract class DoctorService {
                 throw new ConflictException('Bu email veya TC kimlik numarası zaten kullanılıyor');
             }
 
-            // Create user with authentication (without role first)
+            // Create user with authentication and doctor role
             const user = await UsersService.store({
                 firstName: payload.firstName,
                 lastName: payload.lastName,
@@ -117,7 +117,7 @@ export abstract class DoctorService {
                 tcNo: payload.tcNo,
                 gender: payload.gender,
                 password: payload.password,
-                rolesSlugs: ['basic'], // Use basic role initially
+                rolesSlugs: ['doctor'], // Assign doctor role
             });
 
             const doctor = await prisma.doctor.create({

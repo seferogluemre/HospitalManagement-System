@@ -1,8 +1,8 @@
+import { cache } from '#core';
 import prisma from '@onlyjs/db';
 import type { Role } from '@onlyjs/db/client';
 import { PrismaClientKnownRequestError } from '@onlyjs/db/client/runtime/library';
 import slugify from 'slugify';
-import { cache } from '#core';
 import { BadRequestException, ConflictException, NotFoundException } from '../../../utils';
 import { filterRoles } from './dtos';
 import type { RoleCreatePayload, RoleIndexQuery, RoleUpdatePayload } from './types';

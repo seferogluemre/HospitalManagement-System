@@ -1,4 +1,5 @@
 import { auth } from "#modules/auth/authentication/plugin.ts";
+import { PERMISSIONS, withPermission } from "#modules/auth/index.ts";
 import { BadRequestException } from "#utils/http-errors.ts";
 import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
@@ -28,6 +29,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       secretaryClinicCreateDto,
+      withPermission(PERMISSIONS.SECRETARY_CLINICS.CREATE),
       withAuditLog({
         actionType: AuditLogAction.CREATE,
         entityType: AuditLogEntity.USER,
@@ -49,7 +51,10 @@ const app = new Elysia({
       const response = secretaryClinics.map(SecretaryClinicFormatter.response);
       return response;
     },
-    secretaryClinicIndexDto
+    dtoWithMiddlewares(
+      secretaryClinicIndexDto,
+      withPermission(PERMISSIONS.SECRETARY_CLINICS.READ)
+    )
   )
   .get(
     "/:id",
@@ -62,7 +67,10 @@ const app = new Elysia({
       const response = SecretaryClinicFormatter.response(secretaryClinic);
       return response;
     },
-    secretaryClinicShowDto
+    dtoWithMiddlewares(
+      secretaryClinicShowDto,
+      withPermission(PERMISSIONS.SECRETARY_CLINICS.SHOW)
+    )
   )
   .patch(
     "/:id", // update
@@ -77,6 +85,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       secretaryClinicUpdateDto,
+      withPermission(PERMISSIONS.SECRETARY_CLINICS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.USER,
@@ -97,6 +106,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       secretaryClinicDestroyDto,
+      withPermission(PERMISSIONS.SECRETARY_CLINICS.DESTROY),
       withAuditLog({
         actionType: AuditLogAction.DELETE,
         entityType: AuditLogEntity.USER,

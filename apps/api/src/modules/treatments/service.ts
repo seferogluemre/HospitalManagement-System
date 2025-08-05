@@ -237,6 +237,7 @@ export abstract class TreatmentService {
         },
       });
 
+      console.log("Teşhis servisi oluşturuldu:", treatment);
       return treatment;
     } catch (error) {
       await HandleError.handlePrismaError(error, "treatment", "create");

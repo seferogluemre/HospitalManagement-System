@@ -56,6 +56,76 @@ export const PERMISSIONS = {
     UPDATE: { key: 'file-library-assets:update', description: 'Dosya Güncelle', isHidden: true },
     DESTROY: { key: 'file-library-assets:destroy', description: 'Dosya Sil', isHidden: true },
   },
+  CLINICS: {
+    READ: { key: 'clinics:read', description: 'Klinikleri Listele ve Görüntüle' },
+    SHOW: { key: 'clinics:show', description: 'Klinikleri Görüntüle' },
+    CREATE: { key: 'clinics:create', description: 'Klinik Oluştur' },
+    UPDATE: { key: 'clinics:update', description: 'Klinik Güncelle' },
+    DESTROY: { key: 'clinics:destroy', description: 'Klinik Sil' },
+    RESTORE: { key: 'clinics:restore', description: 'Klinik Geri Yükle', isHidden: true },
+  },
+  APPOINTMENTS: {
+    READ: { key: 'appointments:read', description: 'Randevuları Listele ve Görüntüle' },
+    SHOW: { key: 'appointments:show', description: 'Randevuları Görüntüle' },
+    CREATE: { key: 'appointments:create', description: 'Randevu Oluştur' },
+    UPDATE: { key: 'appointments:update', description: 'Randevu Güncelle' },
+    DESTROY: { key: 'appointments:destroy', description: 'Randevu Sil' },
+  },
+  ANNOUNCEMENTS: {
+    READ: { key: 'announcements:read', description: 'Duyuruları Listele ve Görüntüle' },
+    SHOW: { key: 'announcements:show', description: 'Duyuruları Görüntüle' },
+    CREATE: { key: 'announcements:create', description: 'Duyuru Oluştur' },
+    UPDATE: { key: 'announcements:update', description: 'Duyuru Güncelle' },
+    DESTROY: { key: 'announcements:destroy', description: 'Duyuru Sil' },
+  },
+  TREATMENTS: {   
+    READ: { key: 'treatments:read', description: 'Tedavileri Listele ve Görüntüle' },
+    SHOW: { key: 'treatments:show', description: 'Tedavileri Görüntüle' },
+    CREATE: { key: 'treatments:create', description: 'Tedavi Oluştur' },
+    UPDATE: { key: 'treatments:update', description: 'Tedavi Güncelle' },
+    DESTROY: { key: 'treatments:destroy', description: 'Tedavi Sil' },
+  },
+  PRESCRIPTIONS: {
+    READ: { key: 'prescriptions:read', description: 'Reçeteleri Listele ve Görüntüle' },
+    SHOW: { key: 'prescriptions:show', description: 'Reçeteleri Görüntüle' },
+    CREATE: { key: 'prescriptions:create', description: 'Reçete Oluştur' },
+    UPDATE: { key: 'prescriptions:update', description: 'Reçete Güncelle' },
+    DESTROY: { key: 'prescriptions:destroy', description: 'Reçete Sil' },
+  },
+  MEDICAL_RECORDS: {  
+    READ: { key: 'medical-records:read', description: 'Tıbbi Kayıtları Listele ve Görüntüle' },
+    SHOW: { key: 'medical-records:show', description: 'Tıbbi Kayıtları Görüntüle' },
+    CREATE: { key: 'medical-records:create', description: 'Tıbbi Kayıt Oluştur' },
+    UPDATE: { key: 'medical-records:update', description: 'Tıbbi Kayıt Güncelle' },
+    DESTROY: { key: 'medical-records:destroy', description: 'Tıbbi Kayıt Sil' },
+  },
+  SECRETARIES: {
+    READ: { key: 'secretaries:read', description: 'Sekreterleri Listele ve Görüntüle' },
+    SHOW: { key: 'secretaries:show', description: 'Sekreterleri Görüntüle' },
+    CREATE: { key: 'secretaries:create', description: 'Sekreter Oluştur' },
+    UPDATE: { key: 'secretaries:update', description: 'Sekreter Güncelle' },
+    DESTROY: { key: 'secretaries:destroy', description: 'Sekreter Sil' },
+  },
+  SECRETARY_CLINICS: {  
+    SHOW: { key: 'secretary-clinics:show', description: 'Sekreter Kliniklerini Görüntüle' },
+    CREATE: { key: 'secretary-clinics:create', description: 'Sekreter Kliniklerini Oluştur' },
+    UPDATE: { key: 'secretary-clinics:update', description: 'Sekreter Kliniklerini Güncelle' },
+    DESTROY: { key: 'secretary-clinics:destroy', description: 'Sekreter Kliniklerini Sil' },
+  },
+  DOCTORS: {
+    READ: { key: 'doctors:read', description: 'Doktorları Listele ve Görüntüle' },
+    SHOW: { key: 'doctors:show', description: 'Doktorları Görüntüle' },
+    CREATE: { key: 'doctors:create', description: 'Doktor Oluştur' },
+    UPDATE: { key: 'doctors:update', description: 'Doktor Güncelle' },
+    DESTROY: { key: 'doctors:destroy', description: 'Doktor Sil' },
+  },
+  PATIENTS: {
+    READ: { key: 'patients:read', description: 'Hastaları Listele ve Görüntüle' },
+    SHOW: { key: 'patients:show', description: 'Hasta Görüntüle' },
+    CREATE: { key: 'patients:create', description: 'Hasta Oluştur' },
+    UPDATE: { key: 'patients:update', description: 'Hasta Güncelle' },
+    DESTROY: { key: 'patients:destroy', description: 'Hasta Sil' },
+  },
 } as const satisfies Record<string, Record<string, GenericPermissionObject>>;
 
 export const PERMISSION_KEYS = [
@@ -91,6 +161,56 @@ export const PERMISSION_GROUPS = {
     key: 'file-library-assets',
     description: 'Dosya Yönetimi',
     permissions: Object.values(PERMISSIONS.FILE_LIBRARY_ASSETS),
+  },
+  CLINICS: {
+    key: 'clinics',
+    description: 'Klinikler',
+    permissions: Object.values(PERMISSIONS.CLINICS),
+  },
+  APPOINTMENTS: {
+    key: 'appointments',
+    description: 'Randevular',
+    permissions: Object.values(PERMISSIONS.APPOINTMENTS),
+  },
+  ANNOUNCEMENTS: {
+    key: 'announcements',
+    description: 'Duyurular',
+    permissions: Object.values(PERMISSIONS.ANNOUNCEMENTS),
+  },
+  TREATMENTS: {
+    key: 'treatments',
+    description: 'Tedaviler',
+    permissions: Object.values(PERMISSIONS.TREATMENTS),
+  },
+  PRESCRIPTIONS: {
+    key: 'prescriptions',
+    description: 'Reçeteler',
+    permissions: Object.values(PERMISSIONS.PRESCRIPTIONS),
+  },
+  MEDICAL_RECORDS: {
+    key: 'medical-records',
+    description: 'Tıbbi Kayıtlar',
+    permissions: Object.values(PERMISSIONS.MEDICAL_RECORDS),
+  },
+  SECRETARIES: {
+    key: 'secretaries',
+    description: 'Sekreterler',
+    permissions: Object.values(PERMISSIONS.SECRETARIES),
+  },
+  DOCTORS: {
+    key: 'doctors',
+    description: 'Doktorlar',
+    permissions: Object.values(PERMISSIONS.DOCTORS),
+  },
+  PATIENTS: {
+    key: 'patients',
+    description: 'Hastalar',
+    permissions: Object.values(PERMISSIONS.PATIENTS),
+  },
+  SECRETARY_CLINICS: {
+    key: 'secretary-clinics',
+    description: 'Sekreter Klinikleri',
+    permissions: Object.values(PERMISSIONS.SECRETARY_CLINICS),
   },
 } as const satisfies Record<
   string,

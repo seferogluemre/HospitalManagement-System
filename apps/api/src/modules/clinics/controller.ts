@@ -6,6 +6,7 @@ import { AuditLogAction, AuditLogEntity, withAuditLog } from "../audit-logs";
 import { clinicCreateDto, clinicDestroyDto, clinicIndexDto, clinicShowDto, clinicUpdateDto } from "./dtos";
 import { ClinicFormatter } from "./formatters";
 import { ClinicService } from "./service";
+import { PERMISSIONS, withPermission } from "../auth";
 
 const app = new Elysia({
   prefix: "/clinics",
@@ -22,6 +23,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       clinicCreateDto,
+      withPermission(PERMISSIONS.CLINICS.CREATE),
        withAuditLog({
         actionType: AuditLogAction.CREATE,
         entityType: AuditLogEntity.CLINIC,
@@ -65,6 +67,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       clinicUpdateDto,
+      withPermission(PERMISSIONS.CLINICS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.CLINIC,
@@ -82,6 +85,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       clinicDestroyDto,
+      withPermission(PERMISSIONS.CLINICS.DESTROY),
       withAuditLog({
         actionType: AuditLogAction.DELETE,
         entityType: AuditLogEntity.CLINIC,
@@ -100,6 +104,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       clinicShowDto,
+      withPermission(PERMISSIONS.CLINICS.RESTORE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.CLINIC,

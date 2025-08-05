@@ -103,7 +103,7 @@ export abstract class SecretaryService {
                 throw new ConflictException('Bu email veya TC kimlik numarası zaten kullanılıyor');
             }
 
-            // Create user with authentication (without role first)
+            // Create user with authentication and secretary role
             const user = await UsersService.store({
                 firstName: payload.firstName,
                 lastName: payload.lastName,
@@ -111,7 +111,7 @@ export abstract class SecretaryService {
                 tcNo: payload.tcNo,
                 gender: payload.gender,
                 password: payload.password,
-                rolesSlugs: ['basic'], // Use basic role initially
+                rolesSlugs: ['secretary'], // Assign secretary role
             });
 
             // Create Secretary

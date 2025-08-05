@@ -1,4 +1,5 @@
 import { auth } from "#modules/auth/authentication/plugin.ts";
+import { PERMISSIONS, withPermission } from "#modules/auth/index.ts";
 import { BadRequestException } from "#utils/http-errors.ts";
 import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
@@ -29,6 +30,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       patientCreateDto,
+      withPermission(PERMISSIONS.PATIENTS.CREATE),
       withAuditLog({
         actionType: AuditLogAction.CREATE,
         entityType: AuditLogEntity.USER,
@@ -51,7 +53,10 @@ const app = new Elysia({
       const response = patients.map(PatientFormatter.response);
       return response;
     },
-    patientsIndexDto
+    dtoWithMiddlewares(
+      patientsIndexDto,
+      withPermission(PERMISSIONS.PATIENTS.READ)
+    )
   )
   .get(
     "/:uuid",
@@ -63,7 +68,10 @@ const app = new Elysia({
       const response = PatientFormatter.response(patient);
       return response;
     },
-    patientShowDto
+    dtoWithMiddlewares(
+      patientShowDto,
+      withPermission(PERMISSIONS.PATIENTS.SHOW)
+    )
   )
   .patch(
     "/:uuid", // update
@@ -75,6 +83,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       patientUpdateDto,
+      withPermission(PERMISSIONS.PATIENTS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.USER,
@@ -92,6 +101,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       patientDestroyDto,
+      withPermission(PERMISSIONS.PATIENTS.DESTROY),
       withAuditLog({
         actionType: AuditLogAction.DELETE,
         entityType: AuditLogEntity.USER,
@@ -110,6 +120,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       patientShowDto,
+      withPermission(PERMISSIONS.PATIENTS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.USER,
@@ -124,7 +135,10 @@ const app = new Elysia({
       const patientAppointments = await PatientService.getAppointments(uuid);
       return PatientFormatter.withAppointments(patientAppointments);
     },
-    appointmentsGetDto
+    dtoWithMiddlewares(
+      appointmentsGetDto,
+      withPermission(PERMISSIONS.APPOINTMENTS.READ)
+    )
   );
 
 export default app;

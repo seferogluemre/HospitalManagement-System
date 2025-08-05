@@ -138,7 +138,7 @@ export abstract class PatientService {
 
 
 
-            // Create user with authentication (without role first)
+            // Create user with authentication and patient role
             const user = await UsersService.store({
                 firstName: payload.firstName,
                 lastName: payload.lastName,
@@ -146,7 +146,7 @@ export abstract class PatientService {
                 tcNo: payload.tcNo,
                 gender: payload.gender,
                 password: payload.password,
-                rolesSlugs: ['basic'], // Use basic role initially
+                rolesSlugs: ['patient'], // Assign patient role
             });
 
             // Create patient
