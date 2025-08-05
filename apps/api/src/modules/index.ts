@@ -8,12 +8,12 @@ import { fileLibraryAssetsController } from './file-library-assets';
 import { locationsController } from './locations';
 import { patientController } from './patients';
 import { postsController } from './posts';
+import { prescriptionController } from './prescription';
 import { secretaryController } from './secretaries';
 import { secretaryClinicController } from './secretaries/secretary_clinic';
 import { systemAdministrationController } from './system-administration';
 import { treatmentController } from './treatments';
 import { usersController } from './users';
-import { prescriptionController } from './prescription';
 
 const app = new Elysia()
   .use(systemAdministrationController)

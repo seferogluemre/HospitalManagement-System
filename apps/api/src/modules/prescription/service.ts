@@ -1,5 +1,5 @@
 import { HandleError } from "#shared/error/index.ts";
-import { ConflictException, InternalServerErrorException, NotFoundException } from "#utils/http-errors.ts";
+import { NotFoundException } from "#utils/http-errors.ts";
 import prisma from "@onlyjs/db";
 import { Prisma, type Prescription } from "@onlyjs/db/client";
 import type { PrescriptionCreatePayload, PrescriptionIndexQuery, PrescriptionUpdatePayload } from "./types";
