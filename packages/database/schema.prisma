@@ -764,6 +764,9 @@ model Prescription {
   /// @prismabox.hide
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  /// @prismabox.hide
+  deletedAt DateTime @updatedAt @map("deleted_at")
+
   @@map("prescriptions")
 }
 
@@ -786,6 +789,9 @@ model MedicalRecord {
 
   /// @prismabox.hide
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  /// @prismabox.hide
+  deletedAt DateTime @updatedAt @map("deleted_at")
 
   @@map("medical_records")
 }

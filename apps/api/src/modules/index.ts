@@ -13,6 +13,7 @@ import { secretaryClinicController } from './secretaries/secretary_clinic';
 import { systemAdministrationController } from './system-administration';
 import { treatmentController } from './treatments';
 import { usersController } from './users';
+import { prescriptionController } from './prescription';
 
 const app = new Elysia()
   .use(systemAdministrationController)
@@ -30,6 +31,7 @@ const app = new Elysia()
   .use(appointmentController)
   .use(announcementController)
   .use(treatmentController)
+  .use(prescriptionController)
   .get(
     '/',
     () => ({
@@ -64,6 +66,7 @@ export const swaggerTags: { name: string; description: string }[] = [
   { name: 'Secretary Clinics', description: 'Secretary-Clinic Assignment endpoints' },
   { name: 'Clinic', description: 'Clinic endpoints' },
   { name: 'Treatment', description: 'Treatment endpoints' },
+  { name: 'Prescription', description: 'Prescription endpoints' },
 ];
 
 export default app;
