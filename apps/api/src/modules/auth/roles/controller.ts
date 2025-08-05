@@ -1,7 +1,7 @@
 import { Elysia } from 'elysia';
+import { dtoWithPermission } from '../';
 import { dtoWithMiddlewares } from '../../../utils';
 import { AuditLogAction, AuditLogEntity, withAuditLog } from '../../audit-logs';
-import { dtoWithPermission } from '../';
 import { auth, authSwagger } from '../authentication/plugin';
 import { withPermission } from '../roles/middleware';
 import { PERMISSIONS } from './constants';

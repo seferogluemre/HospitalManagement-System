@@ -1,7 +1,7 @@
-import prisma from '@onlyjs/db';
-import type { Role, User } from '@onlyjs/db/client';
 import { cache } from '#core';
 import { ForbiddenException, UnauthorizedException } from '#utils';
+import prisma from '@onlyjs/db';
+import type { Role, User } from '@onlyjs/db/client';
 import type { PermissionIdentifier, PermissionKey } from './types';
 
 const ROLE_CACHE_KEY = (slug: string) => `role:${slug}`;
