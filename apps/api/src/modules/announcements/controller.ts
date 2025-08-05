@@ -3,6 +3,7 @@ import { BadRequestException } from "#utils/http-errors.ts";
 import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
 import { AuditLogAction, AuditLogEntity, withAuditLog } from "../audit-logs";
+import { PERMISSIONS, withPermission } from "../auth";
 import {
   announcementCreateDto,
   announcementDestroyDto,
@@ -29,6 +30,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       announcementCreateDto,
+      withPermission(PERMISSIONS.ANNOUNCEMENTS.CREATE),
       withAuditLog({
         actionType: AuditLogAction.CREATE,
         entityType: AuditLogEntity.ANNOUNCEMENT,
@@ -51,7 +53,10 @@ const app = new Elysia({
       const response = announcements.map((announcement: any) => AnnouncementFormatter.response(announcement));
       return response;
     },
-    announcementsIndexDto
+    dtoWithMiddlewares(
+      announcementsIndexDto,
+      withPermission(PERMISSIONS.ANNOUNCEMENTS.READ)
+    )
   )
   .get(
     "/:uuid",
@@ -63,7 +68,10 @@ const app = new Elysia({
       const response = AnnouncementFormatter.response(announcement as unknown as Announcement);
       return response;
     },
-    announcementShowDto
+    dtoWithMiddlewares(
+      announcementShowDto,
+      withPermission(PERMISSIONS.ANNOUNCEMENTS.SHOW)
+    )
   )
   .patch(
     "/:uuid", // update
@@ -75,6 +83,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       announcementUpdateDto,
+      withPermission(PERMISSIONS.ANNOUNCEMENTS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.ANNOUNCEMENT,
@@ -92,6 +101,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       announcementDestroyDto,
+      withPermission(PERMISSIONS.ANNOUNCEMENTS.DESTROY),
       withAuditLog({
         actionType: AuditLogAction.DELETE,
         entityType: AuditLogEntity.ANNOUNCEMENT,
@@ -110,6 +120,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       announcementShowDto,
+      withPermission(PERMISSIONS.ANNOUNCEMENTS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.ANNOUNCEMENT,

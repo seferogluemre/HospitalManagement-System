@@ -121,7 +121,7 @@ const app = new Elysia({
     dtoWithMiddlewares(
       patientShowDto,
       withPermission(PERMISSIONS.PATIENTS.UPDATE),
-      withAuditLog({
+        withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.USER,
         getEntityUuid: ({ params }: any) => params.id.toString(),

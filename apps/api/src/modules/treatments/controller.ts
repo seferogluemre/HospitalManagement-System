@@ -30,9 +30,7 @@ const app = new Elysia({
   .post(
     "",
     async ({ body }) => {
-      console.log("Teşhis kontrolüne girildi", body);
       const treatment = await TreatmentService.store(body);
-      console.log("Teşhis kontrolünden çıkıldı", treatment);
       return TreatmentFormatter.response(treatment);
     },
     dtoWithMiddlewares(

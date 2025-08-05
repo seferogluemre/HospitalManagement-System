@@ -3,6 +3,7 @@ import { BadRequestException } from "#utils/http-errors.ts";
 import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
 import { AuditLogAction, AuditLogEntity, withAuditLog } from "../audit-logs";
+import { PERMISSIONS, withPermission } from "../auth";
 import {
   appointmentCancelDto,
   appointmentCompleteDto,
@@ -31,6 +32,7 @@ const app = new Elysia({
     },
     dtoWithMiddlewares(
       appointmentCreateDto,
+      withPermission(PERMISSIONS.APPOINTMENTS.CREATE),
       withAuditLog({
         actionType: AuditLogAction.CREATE,
         entityType: AuditLogEntity.APPOINTMENT,
@@ -56,7 +58,10 @@ const app = new Elysia({
       const response = appointments.map((appointment: any) => AppointmentFormatter.response(appointment));
       return response;
     },
-    appointmentsIndexDto
+    dtoWithMiddlewares(
+      appointmentsIndexDto,
+      withPermission(PERMISSIONS.APPOINTMENTS.READ)
+    )
   )
   .get(
     "/:uuid",
@@ -68,7 +73,10 @@ const app = new Elysia({
       const response = AppointmentFormatter.response(appointment as any);
       return response;
     },
-    appointmentShowDto
+    dtoWithMiddlewares(
+      appointmentShowDto,
+      withPermission(PERMISSIONS.APPOINTMENTS.SHOW)
+    )
   )
   .patch(
     "/:uuid", // update
@@ -80,6 +88,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       appointmentUpdateDto,
+      withPermission(PERMISSIONS.APPOINTMENTS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.APPOINTMENT,
@@ -97,6 +106,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       appointmentDestroyDto,
+      withPermission(PERMISSIONS.APPOINTMENTS.DESTROY),
       withAuditLog({
         actionType: AuditLogAction.DELETE,
         entityType: AuditLogEntity.APPOINTMENT,
@@ -115,6 +125,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       appointmentShowDto,
+      withPermission(PERMISSIONS.APPOINTMENTS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.APPOINTMENT,
@@ -133,6 +144,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       appointmentConfirmDto,
+      withPermission(PERMISSIONS.APPOINTMENTS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.APPOINTMENT,
@@ -151,6 +163,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       appointmentCompleteDto,
+      withPermission(PERMISSIONS.APPOINTMENTS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.APPOINTMENT,
@@ -169,6 +182,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       appointmentCancelDto,
+      withPermission(PERMISSIONS.APPOINTMENTS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.APPOINTMENT,
@@ -187,6 +201,7 @@ const app = new Elysia({
     // @ts-ignore - Complex middleware composition
     dtoWithMiddlewares(
       appointmentConfirmDto, // Same as confirm, just params
+      withPermission(PERMISSIONS.APPOINTMENTS.UPDATE),
       withAuditLog({
         actionType: AuditLogAction.UPDATE,
         entityType: AuditLogEntity.APPOINTMENT,

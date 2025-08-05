@@ -3,10 +3,10 @@ import { BadRequestException } from "#utils/http-errors.ts";
 import { dtoWithMiddlewares } from "#utils/middleware-utils.ts";
 import Elysia from "elysia";
 import { AuditLogAction, AuditLogEntity, withAuditLog } from "../audit-logs";
+import { PERMISSIONS, withPermission } from "../auth";
 import { clinicCreateDto, clinicDestroyDto, clinicIndexDto, clinicShowDto, clinicUpdateDto } from "./dtos";
 import { ClinicFormatter } from "./formatters";
 import { ClinicService } from "./service";
-import { PERMISSIONS, withPermission } from "../auth";
 
 const app = new Elysia({
   prefix: "/clinics",
@@ -43,7 +43,10 @@ const app = new Elysia({
       const response = clinics.map(ClinicFormatter.response);
       return response;
     },
-    clinicIndexDto
+    dtoWithMiddlewares(
+      clinicIndexDto,
+      withPermission(PERMISSIONS.CLINICS.READ)
+    )
   )
   .get(
     "/:uuid",
@@ -55,7 +58,10 @@ const app = new Elysia({
       const response = ClinicFormatter.response(clinic);
       return response;
     },
-    clinicShowDto
+    dtoWithMiddlewares(
+      clinicShowDto,
+      withPermission(PERMISSIONS.CLINICS.SHOW)
+    )
   )
   .patch(
     "/:uuid", 
