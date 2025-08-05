@@ -31,7 +31,9 @@ const app = new Elysia({
       withAuditLog({
         actionType: AuditLogAction.CREATE,
         entityType: AuditLogEntity.MEDICAL_RECORD,
-        getEntityUuid: (context: any) => context.body.id,
+        getEntityUuid: (context: any) => {
+          return context.response?.uuid || context.body?.uuid || 'unknown';
+        },
         getDescription: () => "Yeni tıbbi kayıt oluşturuldu",
       })
     )
