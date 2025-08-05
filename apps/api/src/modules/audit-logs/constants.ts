@@ -15,4 +15,5 @@ export const AuditLogEntity = {
   ANNOUNCEMENT: 'Announcement',
   PRESCRIPTION: 'Prescription',
   FILE_LIBRARY_ASSET: 'FileLibraryAsset',
+  MEDICAL_RECORD: 'MedicalRecord',
 } as const satisfies Record<string, PrismaModelNamePascalCase>;

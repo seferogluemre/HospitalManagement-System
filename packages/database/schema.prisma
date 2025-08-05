@@ -571,6 +571,7 @@ model Prescription {
 model MedicalRecord {
   /// @prismabox.hide
   id          String    @id @default(uuid())
+  uuid          String      @unique @default(uuid())
   /// @prismabox.hide
   patientId   Int       @map("patient_id")
   /// @prismabox.hide
