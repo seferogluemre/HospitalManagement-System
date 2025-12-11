@@ -31,8 +31,7 @@ This Turborepo includes the following packages:
 - `pkg-a`: A package that has all scripts in the root `package.json`.
 - `pkg-b`: A package with _almost_ all scripts in the root `package.json`.
 
-### Some scripts to try
-
+### Some scripts to try;
 If you haven't yet, [install global `turbo`](https://turbo.build/repo/docs/installing#install-globally) to run tasks.
 
 - `turbo build lint check-types`: Runs all tasks in the default graph.
